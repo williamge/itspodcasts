@@ -7,8 +7,6 @@ module.exports = function( db ) {
         this.description = description;
         if (guid) {
             this.guid = guid;
-        } else {
-            console.log(title);
         }
     };
 
@@ -28,6 +26,32 @@ module.exports = function( db ) {
 
     Episode.prototype.getID = function() {
         return this.guid || this.link;
+    };
+
+    Episode.find = function( _id, callback ) {
+
+        if (!callback) {
+            callback = function(err){ if (err) throw err; };
+        }
+
+        if (!_id) {
+            return callback( new TypeError('"id" is not a valid parameter') );
+        }
+
+        var episodesCollection = db.collection('episodes');
+        
+        var storedEpisode = episodesCollection.findOne( { _id: _id},
+            function returnEpisode(err, data) {
+                if (!data || err) {
+                    return callback(err, data);
+                }
+                var episode = new Episode();
+                for (var property in data) {
+                    episode[property] = data[property];
+                }
+                return callback(err, episode);
+            }
+        );
     };
 
     Episode.save = function( episode, callback ) {
