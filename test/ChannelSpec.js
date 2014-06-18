@@ -4,7 +4,8 @@ var expect = require('chai').expect;
 
 var mockgodb = require('./mocks/mongodb.js');
 
-var ChannelFactory = require('../Channel');
+var ChannelFactory = require('../Channel'),
+    EpisodeFactory = require('../Episode');
 
 var db, 
     Channel;
@@ -23,6 +24,7 @@ module.exports.run = function() {
             });
 
             describe('should propagate errors', function() {
+                
                 it('title undefined', function(done) {
                     Channel.find(undefined, 
                         function(err, data ){
@@ -106,12 +108,13 @@ module.exports.run = function() {
             beforeEach(function() {
                 db = new mockgodb();
                 Channel = ChannelFactory(db);
+                Episode = EpisodeFactory(db);
             });
 
             it( 'should add an episode to the Channel', 
                 function() {
                     var test_channel = new Channel( 'test channel' );
-                    test_channel.addEpisode('title', 'link', 'description', 'guid');
+                    test_channel.addEpisode( new Episode('channelID', 'title', 'link', 'description', 'guid') );
                     expect(test_channel.localEpisodes.length).to.be.ok; 
                     expect(test_channel.localEpisodes[0].title).to.equal('title');
                 }

@@ -22,7 +22,7 @@ function main() {
 
         var Channel = ChannelFactory(db);
         var Episode = EpisodeFactory(db);
-        var scrape = scrapeFactory(Channel);
+        var scrape = scrapeFactory(Channel, Episode);
 
         function saveScraping( channel ) {
 

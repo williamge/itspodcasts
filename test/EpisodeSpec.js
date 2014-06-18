@@ -16,7 +16,10 @@ module.exports.run = function() {
             it( 'should set up an Episode object' );
         } );
         describe( '#find()', function() {
-            it('should retrieve an Episode object');
+            it('should retrieve an Episode object', 
+                function(){
+                    expect(false).to.equal("no unit test defined");
+                });
         });
 
         describe( '#save()', function() {

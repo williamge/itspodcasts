@@ -5,7 +5,7 @@ module.exports = function( db ) {
     var Channel = function( title ) {
         this.title = title;
 
-        this.episodeIDs = [];
+        this.episodeIDs = {};
 
         //this list will only be populated locally, 
         //even if values are present in the database
@@ -77,22 +77,16 @@ module.exports = function( db ) {
                         return callback(err, channel);
                     }
 
-                    channel.episodeIDs = IDs;                
+                    IDs.forEach( function(element) {
+                        channel.episodeIDs[element._id] = null;
+                    } );              
                     return callback(err, channel);
                 });
             }
         );
     };
 
-    Channel.prototype.addEpisode = function ( title, link, description, guid ) {
-        
-        var episode = new Episode(
-            this.getID(),
-            title,
-            link, 
-            description,
-            guid
-        );
+    Channel.prototype.addEpisode = function ( episode ) {
 
         //DELETE: this.episodeIDs.push( episode.getID() );
         this.localEpisodes.push( episode );
