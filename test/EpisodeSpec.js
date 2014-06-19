@@ -16,7 +16,23 @@ module.exports.run = function() {
             it( 'should set up an Episode object' );
         } );
         describe( '#find()', function() {
-            it('should retrieve an Episode object');
+
+            beforeEach(function() {
+                db = new mockgodb();
+                Episode = EpisodeFactory(db);
+            });
+
+            it('should retrieve an Episode object when it is in the db', 
+                function(done) {
+                    Episode.find("in collection",  function( err, data ){
+                        expect(data).to.be.ok;
+                        console.log("here2");
+
+                        expect(data).to.be.an.instanceOf(Episode);
+                        done();
+                    });
+                }
+            );
         });
 
         describe( '#save()', function() {

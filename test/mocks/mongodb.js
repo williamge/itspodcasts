@@ -56,6 +56,34 @@ function db() {
                     if (cb) return cb( new Error("fake database error") , null);
                 }
                 this.saved.push( json );
+            },
+            find : function ( query, fields, cb ) {
+                if ( query._id ==  "in collection") {
+                    if (cb) return cb( null, true ); 
+                } else if ( query.title == "title returns error" ) {
+                    if (cb) return cb( new Error("fake database error") , null);
+                } else {
+                    if (cb) cb( null, null );
+                    return {
+                        toArray: function(cb) {
+                            return cb(null, [true]);
+                        }
+                    };
+                }
+            },
+            findOne : function ( query, cb ) {
+                if ( query._id ==  "in collection") {
+                    if (cb) return cb( null, true ); 
+                } else if ( query.title == "title returns error" ) {
+                    if (cb) return cb( new Error("fake database error") , null);
+                } else {
+                    if (cb) cb( null, null );
+                    return {
+                        toArray: function(cb) {
+                            return cb(null, [true]);
+                        }
+                    };
+                }
             }
         }
     };
