@@ -16,6 +16,7 @@ module.exports.run = function() {
             it( 'should set up an Episode object' );
         } );
         describe( '#find()', function() {
+<<<<<<< HEAD
 
             beforeEach(function() {
                 db = new mockgodb();
@@ -33,6 +34,12 @@ module.exports.run = function() {
                     });
                 }
             );
+=======
+            it('should retrieve an Episode object', 
+                function(){
+                    expect(false).to.equal("no unit test defined");
+                });
+>>>>>>> store-ids
         });
 
         describe( '#save()', function() {

@@ -1,7 +1,7 @@
 var xml2js = require('xml2js'),
     parseString = xml2js.parseString;
 
-module.exports = function( Channel ) {
+module.exports = function( Channel, Episode ) {
 
     /**
      * 
@@ -31,13 +31,23 @@ module.exports = function( Channel ) {
             var episodes = element.item;
 
             episodes.forEach( function( element, index, array ) {
-                var episode = scrapeEpisode( element);
-                channel.addEpisode(  
-                    episode.title,
-                    episode.link,
-                    episode.description,
-                    episode.guid
+                var episodeJSON = scrapeEpisode( element );
+                var episode = new Episode( 
+                    channel.getID(),
+                    episodeJSON.title, 
+                    episodeJSON.link,
+                    episodeJSON.description, 
+                    episodeJSON.guid 
                 );
+                if ( !( episode.getID() in channel.episodeIDs ) )
+                {
+                    console.log("adding episode to channel");
+                    channel.addEpisode(  
+                        episode
+                    );
+                } else {
+                    console.log("episode already in db");
+                }
             } );
 
             callback( err, channel );
