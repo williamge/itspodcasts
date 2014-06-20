@@ -56,8 +56,12 @@ module.exports.run = function(dbURL) {
                 });
                 it('database error', function(done) {
 
-                    db.admin().command( testHelpers.socketExceptionCommand(2) );
-
+                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
+                    
                     Channel.find("title returns error", 
                         function(err, data ){
                             expect(err).to.be.ok;
@@ -109,7 +113,11 @@ module.exports.run = function(dbURL) {
                     );
                 });
                 it('database error', function(done) {
-                    db.admin().command( testHelpers.socketExceptionCommand(2) );
+                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
 
                     Channel.save( new Channel("title returns error"), 
                         function(err, data ){

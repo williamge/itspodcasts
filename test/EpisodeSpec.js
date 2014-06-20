@@ -61,6 +61,22 @@ module.exports.run = function(dbURL) {
                     });
                 }
             );
+
+            describe('should propagate errors', function() {
+                it('database error', function(done) {
+                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
+                    
+                    Episode.find('anything',  function( err, data ){
+                        expect(err).to.be.ok;
+                        done();
+                    });
+                });
+            });
+
         });
 
         describe( '#save()', function() {
@@ -79,7 +95,11 @@ module.exports.run = function(dbURL) {
                     );
                 });
                 it('database error', function(done) {
-                    db.admin().command( testHelpers.socketExceptionCommand(2) );
+                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
 
                     Episode.save( new Episode("channel", "title returns error"), 
                         function(err, data ){
