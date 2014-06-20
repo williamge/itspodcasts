@@ -88,6 +88,7 @@ module.exports.run = function(dbURL) {
                 function(done) {
                     Channel.find( "not in a collection, nope", function(err, data) {
                         expect(data).to.not.be.ok; 
+                        expect(err).to.not.be.ok;
                         done(); 
                     } );
                                   
@@ -132,7 +133,7 @@ module.exports.run = function(dbURL) {
                 function(done) {
                     var test_channel = new Channel( 'test channel' );
                     Channel.save( test_channel );
-                    db.collection('channels').findOne( {_id: 'test channel'} , function(err, result) {
+                    db.collection('channels').findOne( {_id: test_channel.getID()} , function(err, result) {
                         expect(result).to.be.ok;
                         done();
                     } );
