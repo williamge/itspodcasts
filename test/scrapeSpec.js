@@ -10,9 +10,11 @@ var xml2js = require('xml2js'),
 var MongoClient = require('mongodb').MongoClient;
 
 var Channel,
+    Episode,
     db;
 
-var ChannelFactory = require('../Channel');
+var ChannelFactory = require('../Channel'),
+    EpisodeFactory = require('../Episode');
 
 var scrapePackage = require('../scrape');
 
@@ -31,6 +33,14 @@ module.exports.run = function(dbURL) {
             db = connectedDb;
             done();
         } );
+    });
+
+    beforeEach(function(done) {
+        db.dropDatabase(done);
+    });
+
+    after(function(done) {
+        db.dropDatabase(done);
     });
 
     describe('scrape', function() {
@@ -67,10 +77,10 @@ module.exports.run = function(dbURL) {
             } );
         } );
 
-
         beforeEach( function() {
             Channel = ChannelFactory(db);
-            scrape = scrapePackage(Channel);
+            Episode = EpisodeFactory(db);
+            scrape = scrapePackage(Channel, Episode);
         });
 
         describe( '#scrapeEpisode()', function() {
@@ -95,9 +105,9 @@ module.exports.run = function(dbURL) {
                 scrape.scrapeSource( xml, function(err, channelList) {
                     expect(channelList).to.have.length(1);
                     channelList.forEach( function(element, index, array) {
-                        Channel.save(element);
+                        expect(element).to.have.property("title");
+                        expect(element).to.be.an.instanceOf(Channel);
                     } );
-                    expect(db.collections.channels.saved).to.have.length(1);
                     done();
                 } );
             });
