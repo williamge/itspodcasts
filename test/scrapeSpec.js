@@ -7,8 +7,10 @@ var Q = require('q');
 var xml2js = require('xml2js'),
     parseString = xml2js.parseString;
 
-var mockgodb = require('./mocks/mongodb.js');
-var db, Channel;
+var MongoClient = require('mongodb').MongoClient;
+
+var Channel,
+    db;
 
 var ChannelFactory = require('../Channel');
 
@@ -19,7 +21,17 @@ var test_xml_channel = Q.nfcall(
     __dirname + '/data/test_channel.xml'
 );
 
-module.exports.run = function() {
+module.exports.run = function(dbURL) {
+
+    before(function(done) {
+        MongoClient.connect( dbURL, function(err, connectedDb) {
+            if (err) {
+                throw err;
+            }
+            db = connectedDb;
+            done();
+        } );
+    });
 
     describe('scrape', function() {
 
@@ -57,7 +69,6 @@ module.exports.run = function() {
 
 
         beforeEach( function() {
-            db = new mockgodb();
             Channel = ChannelFactory(db);
             scrape = scrapePackage(Channel);
         });

@@ -2,15 +2,26 @@
 
 var expect = require('chai').expect;
 
-var mockgodb = require('./mocks/mongodb.js');
+var MongoClient = require('mongodb').MongoClient;
 
 var EpisodeFactory = require('../Episode');
 
-var db, 
-    Episode;
+var Episode,
+    db;
 
 
-module.exports.run = function() {
+module.exports.run = function(dbURL) {
+
+    before(function(done) {
+        MongoClient.connect( dbURL, function(err, connectedDb) {
+            if (err) {
+                throw err;
+            }
+            db = connectedDb;
+            done();
+        } );
+    });
+
     describe( 'Episode', function() {
         describe( '#new', function() {
             it( 'should set up an Episode object' );
@@ -18,7 +29,6 @@ module.exports.run = function() {
         describe( '#find()', function() {
 
             beforeEach(function() {
-                db = new mockgodb();
                 Episode = EpisodeFactory(db);
             });
 
@@ -42,7 +52,6 @@ module.exports.run = function() {
         describe( '#save()', function() {
 
             beforeEach(function() {
-                db = new mockgodb();
                 Episode = EpisodeFactory(db);
             });
 
