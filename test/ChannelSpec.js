@@ -4,6 +4,8 @@ var expect = require('chai').expect;
 
 var MongoClient = require('mongodb').MongoClient;
 
+var testHelpers = require('./testHelpers');
+
 var ChannelFactory = require('../Channel'),
     EpisodeFactory = require('../Episode');
 
@@ -21,6 +23,14 @@ module.exports.run = function(dbURL) {
             db = connectedDb;
             done();
         } );
+    });
+
+    beforeEach(function(done) {
+        db.dropDatabase(done);
+    });
+
+    after(function(done) {
+        db.dropDatabase(done);
     });
 
     describe( 'Channel', function() {
@@ -46,6 +56,9 @@ module.exports.run = function(dbURL) {
                     );
                 });
                 it('database error', function(done) {
+
+                    db.admin().command( testHelpers.socketExceptionCommand(2) );
+
                     Channel.find("title returns error", 
                         function(err, data ){
                             expect(err).to.be.ok;
@@ -57,7 +70,8 @@ module.exports.run = function(dbURL) {
 
             it( 'should return a Channel when it is in the db' , 
                 function(done) {
-                    Channel.find( "in collection", function( err, data ) {
+                    Channel.save( new Channel('test channel') );
+                    Channel.find( 'test channel', function( err, data ) {
                         expect(data).to.be.ok; 
 
                         //we should be fine in this case but sometimes this might backfire since instanceOf can bug out if the constructors exist
@@ -87,6 +101,7 @@ module.exports.run = function(dbURL) {
 
             describe('should propagate errors', function() {
                 it('not a Channel object', function(done) {
+                
                     Channel.save( [], 
                         function(err, data ){
                             expect(err).to.be.ok;
@@ -96,6 +111,8 @@ module.exports.run = function(dbURL) {
                     );
                 });
                 it('database error', function(done) {
+                    db.admin().command( testHelpers.socketExceptionCommand(2) );
+
                     Channel.save( new Channel("title returns error"), 
                         function(err, data ){
                             expect(err).to.be.ok;
@@ -106,11 +123,15 @@ module.exports.run = function(dbURL) {
             });
 
             it( 'should save a Channel' , 
-                function() {
+                function(done) {
                     var test_channel = new Channel( 'test channel' );
                     Channel.save( test_channel );
-                    expect(db.collections.channels.saved.length).to.be.ok;   
-                    expect(db.collections.channels.saved[0]._id).to.equal( test_channel.getID() );    
+                    db.collection('channels').findOne( {_id: 'test channel'} , function(err, result) {
+                        expect(result).to.be.ok;
+                        done();
+                    } );
+                    //expect(db.collections.channels.saved.length).to.be.ok;   
+                    //expect(db.collections.channels.saved[0]._id).to.equal( test_channel.getID() );    
                 }
             );
         });

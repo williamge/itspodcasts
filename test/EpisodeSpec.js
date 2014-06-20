@@ -4,6 +4,8 @@ var expect = require('chai').expect;
 
 var MongoClient = require('mongodb').MongoClient;
 
+var testHelpers = require('./testHelpers');
+
 var EpisodeFactory = require('../Episode');
 
 var Episode,
@@ -22,6 +24,14 @@ module.exports.run = function(dbURL) {
         } );
     });
 
+    beforeEach(function(done) {
+        db.dropDatabase(done);
+    });
+
+    after(function(done) {
+        db.dropDatabase(done);
+    });
+
     describe( 'Episode', function() {
         describe( '#new', function() {
             it( 'should set up an Episode object' );
@@ -34,19 +44,24 @@ module.exports.run = function(dbURL) {
 
             it('should retrieve an Episode object when it is in the db', 
                 function(done) {
-                    Episode.find("in collection",  function( err, data ){
-                        expect(data).to.be.ok;
-                        console.log("here2");
 
+                    var episode =  new Episode(
+                        'channelID',
+                        'test title', 
+                        'link', 
+                        'description', 
+                        'guid'  
+                    ) ;
+
+                    Episode.save( episode );
+
+                    Episode.find(episode.getID,  function( err, data ){
+                        expect(data).to.be.ok;
                         expect(data).to.be.an.instanceOf(Episode);
                         done();
                     });
                 }
             );
-            it('should retrieve an Episode object', 
-                function(){
-                    expect(false).to.equal("no unit test defined");
-                });
         });
 
         describe( '#save()', function() {
@@ -66,6 +81,8 @@ module.exports.run = function(dbURL) {
                     );
                 });
                 it('database error', function(done) {
+                    db.admin().command( testHelpers.socketExceptionCommand(2) );
+
                     Episode.save( new Episode("channel", "title returns error"), 
                         function(err, data ){
                             expect(err).to.be.ok;
@@ -76,11 +93,21 @@ module.exports.run = function(dbURL) {
             });
 
             it( 'should save an Episode' , 
-                function() {
-                    var test_episode = new Episode( 'test episode', 'link', 'description', 'guid' );
-                    Episode.save( test_episode );
-                    expect(db.collections.episodes.saved.length).to.be.ok;   
-                    expect(db.collections.episodes.saved[0]._id).to.equal( test_episode.getID() );    
+                function(done) {
+                    var episode =  new Episode(
+                        'channelID',
+                        'test title', 
+                        'link', 
+                        'description', 
+                        'guid'  
+                    ) ;
+
+                    Episode.save( episode );
+
+                    db.collection('episodes').findOne( {_id: episode.getID} , function(err, result) {
+                        expect(result).to.be.ok;
+                        done();
+                    } );
                 }
             );
         });
