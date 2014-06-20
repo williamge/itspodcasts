@@ -56,7 +56,7 @@ module.exports = function( db ) {
             episodesCollection = db.collection('episodes');
         var storedChannel = channelsCollection.findOne( { title: title},
             function returnChannel(err, data) {
-                if (!data) {
+                if (err || !data) {
                     return callback(err, data);
                 }
                 var channel = new Channel();
