@@ -56,7 +56,6 @@ module.exports.run = function(dbURL) {
                     Episode.save( episode );
 
                     Episode.find(episode.getID,  function( err, data ){
-                        expect(data).to.be.ok;
                         expect(data).to.be.an.instanceOf(Episode);
                         done();
                     });
@@ -74,7 +73,6 @@ module.exports.run = function(dbURL) {
                 it('not an Episode object', function(done) {
                     Episode.save( [], 
                         function(err, data ){
-                            expect(err).to.be.ok;
                             expect(err).to.be.instanceOf(TypeError);
                             done(); 
                         }

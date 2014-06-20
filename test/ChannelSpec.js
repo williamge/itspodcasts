@@ -49,7 +49,6 @@ module.exports.run = function(dbURL) {
                 it('title undefined', function(done) {
                     Channel.find(undefined, 
                         function(err, data ){
-                            expect(err).to.be.ok;
                             expect(err).to.be.instanceOf(TypeError);
                             done(); 
                         }
@@ -104,7 +103,6 @@ module.exports.run = function(dbURL) {
                 
                     Channel.save( [], 
                         function(err, data ){
-                            expect(err).to.be.ok;
                             expect(err).to.be.instanceOf(TypeError);
                             done(); 
                         }
