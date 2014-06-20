@@ -1,6 +1,9 @@
 var xml2js = require('xml2js'),
     parseString = xml2js.parseString;
 
+var selectiveLog = require('./logging'),
+    logLevel = selectiveLog.logLevels;
+
 module.exports = function( Channel, Episode ) {
 
     /**
@@ -41,12 +44,12 @@ module.exports = function( Channel, Episode ) {
                 );
                 if ( !( episode.getID() in channel.episodeIDs ) )
                 {
-                    console.log("adding episode to channel");
+                    selectiveLog("adding episode to channel", logLevel.informational);
                     channel.addEpisode(  
                         episode
                     );
                 } else {
-                    console.log("episode already in db");
+                    selectiveLog("episode already in db", logLevel.informational);
                 }
             } );
 
