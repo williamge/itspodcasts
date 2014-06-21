@@ -7,16 +7,13 @@ var Q = require('q');
 var xml2js = require('xml2js'),
     parseString = xml2js.parseString;
 
-var MongoClient = require('mongodb').MongoClient;
+var mongoose = require('mongoose');
 
-var Channel,
-    Episode,
-    db;
-
-var ChannelFactory = require('../Channel'),
-    EpisodeFactory = require('../Episode');
+var Channel = require('../Channel'),
+    Episode = require('../Episode');
 
 var scrapePackage = require('../scrape');
+var scrape = scrapePackage(Channel, Episode);
 
 var test_xml_channel = Q.nfcall( 
     require('fs').readFile,
@@ -25,22 +22,12 @@ var test_xml_channel = Q.nfcall(
 
 module.exports.run = function(dbURL) {
 
-    before(function(done) {
-        MongoClient.connect( dbURL, function(err, connectedDb) {
-            if (err) {
-                throw err;
-            }
-            db = connectedDb;
-            done();
-        } );
-    });
-
     beforeEach(function(done) {
-        db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase(done);
     });
 
     after(function(done) {
-        db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase(done);
     });
 
     describe('scrape', function() {
@@ -77,12 +64,6 @@ module.exports.run = function(dbURL) {
             } );
         } );
 
-        beforeEach( function() {
-            Channel = ChannelFactory(db);
-            Episode = EpisodeFactory(db);
-            scrape = scrapePackage(Channel, Episode);
-        });
-
         describe( '#scrapeEpisode()', function() {
             it( 'should return an episode object', function() {
                 var episode = scrape.scrapeEpisode( xml_episode );
@@ -106,7 +87,7 @@ module.exports.run = function(dbURL) {
                     expect(channelList).to.have.length(1);
                     channelList.forEach( function(element, index, array) {
                         expect(element).to.have.property("title");
-                        expect(element).to.be.an.instanceOf(Channel);
+                        expect(element).to.be.an.instanceOf(Channel.model);
                     } );
                     done();
                 } );

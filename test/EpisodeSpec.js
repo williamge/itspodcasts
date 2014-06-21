@@ -2,34 +2,21 @@
 
 var expect = require('chai').expect;
 
-var MongoClient = require('mongodb').MongoClient;
+var mongoose = require('mongoose');
 
 var testHelpers = require('./testHelpers');
 
-var EpisodeFactory = require('../Episode');
-
-var Episode,
-    db;
+var Episode = require('../Episode');
 
 
 module.exports.run = function(dbURL) {
 
-    before(function(done) {
-        MongoClient.connect( dbURL, function(err, connectedDb) {
-            if (err) {
-                throw err;
-            }
-            db = connectedDb;
-            done();
-        } );
-    });
-
     beforeEach(function(done) {
-        db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase(done);
     });
 
     after(function(done) {
-        db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase(done);
     });
 
     describe( 'Episode', function() {
@@ -38,39 +25,39 @@ module.exports.run = function(dbURL) {
         } );
         describe( '#find()', function() {
 
-            beforeEach(function() {
-                Episode = EpisodeFactory(db);
-            });
-
             it('should retrieve an Episode object when it is in the db', 
                 function(done) {
 
-                    var episode =  new Episode(
-                        'channelID',
-                        'test title', 
-                        'link', 
-                        'description', 
-                        'guid'  
-                    ) ;
+                    var episode =  new Episode.model({
+                        title : 'test title', 
+                        link : 'link',
+                        description : 'description',
+                        guid : 'guid'
+                    } );
 
-                    Episode.save( episode );
+                    episode.save( function(err) {
+                        expect(err).to.not.be.ok;
+                        Episode.model.findOne(episode.getID(),  
+                            function( err, data ){
+                                expect(err).to.not.be.ok;
 
-                    Episode.find(episode.getID,  function( err, data ){
-                        expect(data).to.be.an.instanceOf(Episode);
-                        done();
-                    });
+                                expect(data).to.be.an.instanceOf(Episode.model);
+                                done();
+                            }
+                        );
+                    } );
                 }
             );
 
             describe('should propagate errors', function() {
                 it('database error', function(done) {
-                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
                         expect(err.message, 
                             'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
                             ).to.have.string("connection closed");
                     } );
                     
-                    Episode.find('anything',  function( err, data ){
+                    Episode.model.find( { _id :'anything' },  function( err, data ){
                         expect(err).to.be.ok;
                         done();
                     });
@@ -81,27 +68,20 @@ module.exports.run = function(dbURL) {
 
         describe( '#save()', function() {
 
-            beforeEach(function() {
-                Episode = EpisodeFactory(db);
-            });
-
             describe('should propagate errors', function() {
-                it('not an Episode object', function(done) {
-                    Episode.save( [], 
-                        function(err, data ){
-                            expect(err).to.be.instanceOf(TypeError);
-                            done(); 
-                        }
-                    );
-                });
                 it('database error', function(done) {
-                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
                         expect(err.message, 
                             'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
                             ).to.have.string("connection closed");
                     } );
 
-                    Episode.save( new Episode("channel", "title returns error"), 
+                    ( new Episode.model({
+                        channel: "channel",
+                        title: "title returns error",
+                        guid: "guid"
+                    }))
+                    .save( 
                         function(err, data ){
                             expect(err).to.be.ok;
                             done(); 
@@ -112,19 +92,18 @@ module.exports.run = function(dbURL) {
 
             it( 'should save an Episode' , 
                 function(done) {
-                    var episode =  new Episode(
-                        'channelID',
-                        'test title', 
-                        'link', 
-                        'description', 
-                        'guid'  
-                    ) ;
+                    var episode =  new Episode.model({
+                        title : 'test title', 
+                        link : 'link',
+                        description : 'description',
+                        guid : 'guid'
+                    } );
 
-                    Episode.save( episode );
-
-                    db.collection('episodes').findOne( {_id: episode.getID} , function(err, result) {
-                        expect(result).to.be.ok;
-                        done();
+                    episode.save( function(err) {
+                        Episode.model.findOne( {_id: episode.getID()} , function(err, result) {
+                            expect(result).to.be.ok;
+                            done();
+                        } );
                     } );
                 }
             );
