@@ -26,7 +26,7 @@ module.exports = function( Channel, Episode ) {
      * @param  {Function} callback [to be called after element is turned in to a Channel]  
      */
     function scrapeChannel ( channelXML, callback ) {
-        Channel.model.find( channelXML.title[0], function elementResult(err, channel) {
+        Channel.model.findOne( channelXML.title[0], function elementResult(err, channel) {
             if (!channel) {
                 channel = new Channel.model( {
                     title: channelXML.title[0] 
@@ -43,7 +43,7 @@ module.exports = function( Channel, Episode ) {
                     description: episodeJSON.description, 
                     guid: episodeJSON.guid 
                 } );
-                if ( !channel.episodes( episode.getID() )  )
+                if ( !channel.episodes.id( episode.getID() )  )
                 {
                     selectiveLog("adding episode to channel", logLevel.informational);
                     episode._id = episode.getID;

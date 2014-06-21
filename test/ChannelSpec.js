@@ -16,11 +16,13 @@ var Channel,
 module.exports.run = function() {
 
     beforeEach(function(done) {
-        mongoose.connection.db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase();
+        done();
     });
 
     after(function(done) {
-        mongoose.connection.db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase();
+        done();
     });
 
     describe( 'Channel', function() {
@@ -29,21 +31,7 @@ module.exports.run = function() {
         } );
         describe( '#find()', function() {
 
-            beforeEach(function() {
-                //db = new mockgodb();
-                //Channel = ChannelFactory(;
-            });
-
             describe('should propagate errors', function() {
-                
-                it('title undefined', function(done) {
-                    Channel.model.find(undefined, 
-                        function(err, data ){
-                            expect(err).to.be.instanceOf(TypeError);
-                            done(); 
-                        }
-                    );
-                });
                 it('database error', function(done) {
 
                     mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
@@ -89,10 +77,6 @@ module.exports.run = function() {
         });
         describe( '#save()', function() {
 
-            beforeEach(function() {
-                //db = new mockgodb();
-                //Channel = ChannelFactory(db);
-            });
 
             describe('should propagate errors', function() {
                 it('database error', function(done) {
@@ -119,19 +103,11 @@ module.exports.run = function() {
                             expect(result).to.be.ok;
                             done();
                         } );
-                    } );
-                    //expect(db.collections.channels.saved.length).to.be.ok;   
-                    //expect(db.collections.channels.saved[0]._id).to.equal( test_channel.getID() );    
+                    } ); 
                 }
             );
         });
         describe( '#addEpisode()', function() {
-
-            beforeEach(function() {
-                //db = new mockgodb();
-                //Channel = ChannelFactory(db);
-                //Episode = EpisodeFactory(db);
-            });
 
             it( 'should add an episode to the Channel', 
                 function() {

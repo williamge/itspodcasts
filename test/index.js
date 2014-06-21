@@ -6,8 +6,19 @@ var mongoose = require('mongoose');
 
 var dbURL = 'mongodb://localhost/TEST-podcasts';
 
-before( function() {
-    mongoose.connect(dbURL);
+before( function(done) {
+    mongoose.connect(dbURL, function(err) {
+        if (err)
+            throw err;
+
+        done();
+    });
+    
+    mongoose.connection.on('error', function (err) {
+      console.log('Could not connect to mongo server!');
+      console.log(err);
+    });
+
 } );
 
 ChannelSpec.run(dbURL);

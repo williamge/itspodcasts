@@ -10,11 +10,11 @@ var cmd_args = {
 };
 
 var warn_regex = /warn([0-9])/g,
-    re;
+    regexResult;
 
 process.argv.forEach( function( element, index, array ) {
-    if ( ( re = warn_regex.exec( element ) ) !== null ) {
-        cmd_args.warn_level = re[1];
+    if ( ( regexResult = warn_regex.exec( element ) ) !== null ) {
+        cmd_args.warn_level = regexResult[1];
     }
 } );
 
