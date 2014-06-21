@@ -2,35 +2,25 @@
 
 var expect = require('chai').expect;
 
-var MongoClient = require('mongodb').MongoClient;
+var mongoose = require('mongoose');
 
 var testHelpers = require('./testHelpers');
 
-var ChannelFactory = require('../Channel'),
-    EpisodeFactory = require('../Episode');
+var Channel = require('../Channel'),
+    Episode = require('../Episode');
 
 var Channel,
     db;
 
 
-module.exports.run = function(dbURL) {
-
-    before(function(done) {
-        MongoClient.connect( dbURL, function(err, connectedDb) {
-            if (err) {
-                throw err;
-            }
-            db = connectedDb;
-            done();
-        } );
-    });
+module.exports.run = function() {
 
     beforeEach(function(done) {
-        db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase(done);
     });
 
     after(function(done) {
-        db.dropDatabase(done);
+        mongoose.connection.db.dropDatabase(done);
     });
 
     describe( 'Channel', function() {
@@ -41,13 +31,13 @@ module.exports.run = function(dbURL) {
 
             beforeEach(function() {
                 //db = new mockgodb();
-                Channel = ChannelFactory(db);
+                //Channel = ChannelFactory(;
             });
 
             describe('should propagate errors', function() {
                 
                 it('title undefined', function(done) {
-                    Channel.find(undefined, 
+                    Channel.model.find(undefined, 
                         function(err, data ){
                             expect(err).to.be.instanceOf(TypeError);
                             done(); 
@@ -56,13 +46,13 @@ module.exports.run = function(dbURL) {
                 });
                 it('database error', function(done) {
 
-                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
                         expect(err.message, 
                             'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
                             ).to.have.string("connection closed");
                     } );
                     
-                    Channel.find("title returns error", 
+                    Channel.model.find("title returns error", 
                         function(err, data ){
                             expect(err).to.be.ok;
                             done(); 
@@ -73,20 +63,21 @@ module.exports.run = function(dbURL) {
 
             it( 'should return a Channel when it is in the db' , 
                 function(done) {
-                    Channel.save( new Channel('test channel') );
-                    Channel.find( 'test channel', function( err, data ) {
-                        expect(data).to.be.ok; 
+                    ( new Channel.model( {title :'test channel'}) ).save( function(err, data) {
+                        Channel.model.findOne( { title:'test channel'}, function( err, data ) {
+                            expect(data).to.be.ok; 
 
-                        //we should be fine in this case but sometimes this might backfire since instanceOf can bug out if the constructors exist
-                        //in different 'realms' (think like having the same object in two different iframes)
-                        expect(data).to.be.an.instanceOf(Channel);
-                        done(); 
-                    } );                 
+                            //we should be fine in this case but sometimes this might backfire since instanceOf can bug out if the constructors exist
+                            //in different 'realms' (think like having the same object in two different iframes)
+                            expect(data).to.be.an.instanceOf(Channel.model);
+                            done(); 
+                        } );    
+                    } );
                 }
             );
             it( 'should return nothing when it is not in the db' , 
                 function(done) {
-                    Channel.find( "not in a collection, nope", function(err, data) {
+                    Channel.model.findOne( {title : "not in a collection, nope" }, function(err, data) {
                         expect(data).to.not.be.ok; 
                         expect(err).to.not.be.ok;
                         done(); 
@@ -100,27 +91,18 @@ module.exports.run = function(dbURL) {
 
             beforeEach(function() {
                 //db = new mockgodb();
-                Channel = ChannelFactory(db);
+                //Channel = ChannelFactory(db);
             });
 
             describe('should propagate errors', function() {
-                it('not a Channel object', function(done) {
-                
-                    Channel.save( [], 
-                        function(err, data ){
-                            expect(err).to.be.instanceOf(TypeError);
-                            done(); 
-                        }
-                    );
-                });
                 it('database error', function(done) {
-                    db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
                         expect(err.message, 
                             'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
                             ).to.have.string("connection closed");
                     } );
 
-                    Channel.save( new Channel("title returns error"), 
+                    ( new Channel.model( { title : "title returns error" } ) ).save( 
                         function(err, data ){
                             expect(err).to.be.ok;
                             done(); 
@@ -131,11 +113,12 @@ module.exports.run = function(dbURL) {
 
             it( 'should save a Channel' , 
                 function(done) {
-                    var test_channel = new Channel( 'test channel' );
-                    Channel.save( test_channel );
-                    db.collection('channels').findOne( {_id: test_channel.getID()} , function(err, result) {
-                        expect(result).to.be.ok;
-                        done();
+                    var test_channel = new Channel.model( {title: 'test channel' } );
+                    test_channel.save( function(err) {
+                        Channel.model.findOne( {title: test_channel.getID()} , function(err, result) {
+                            expect(result).to.be.ok;
+                            done();
+                        } );
                     } );
                     //expect(db.collections.channels.saved.length).to.be.ok;   
                     //expect(db.collections.channels.saved[0]._id).to.equal( test_channel.getID() );    
@@ -146,16 +129,21 @@ module.exports.run = function(dbURL) {
 
             beforeEach(function() {
                 //db = new mockgodb();
-                Channel = ChannelFactory(db);
-                Episode = EpisodeFactory(db);
+                //Channel = ChannelFactory(db);
+                //Episode = EpisodeFactory(db);
             });
 
             it( 'should add an episode to the Channel', 
                 function() {
-                    var test_channel = new Channel( 'test channel' );
-                    test_channel.addEpisode( new Episode('channelID', 'title', 'link', 'description', 'guid') );
-                    expect(test_channel.localEpisodes.length).to.be.ok; 
-                    expect(test_channel.localEpisodes[0].title).to.equal('title');
+                    var test_channel = new Channel.model( { title: 'test channel' } );
+                    test_channel.addEpisode( new Episode.model( {
+                        title: 'title', 
+                        link:'link', 
+                        description:'description',
+                        guid: 'guid'
+                    } ) );
+                    expect(test_channel.episodes.length).to.be.ok; 
+                    expect(test_channel.episodes[0].title).to.equal('title');
                 }
             );
         });
