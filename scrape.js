@@ -25,26 +25,28 @@ module.exports = function( Channel, Episode ) {
      * @param  {XML-DOM object corresponding to a 'channel' element from an RSS feed}   element
      * @param  {Function} callback [to be called after element is turned in to a Channel]  
      */
-    function scrapeChannel ( element, callback ) {
-        Channel.find( element.title[0], function elementResult(err, channel) {
+    function scrapeChannel ( channelXML, callback ) {
+        Channel.model.find( channelXML.title[0], function elementResult(err, channel) {
             if (!channel) {
-                channel = new Channel( element.title[0] );
+                channel = new Channel.model( {
+                    title: channelXML.title[0] 
+                } );
             }
 
-            var episodes = element.item;
+            var episodes = channelXML.item;
 
-            episodes.forEach( function( element, index, array ) {
-                var episodeJSON = scrapeEpisode( element );
-                var episode = new Episode( 
-                    channel.getID(),
-                    episodeJSON.title, 
-                    episodeJSON.link,
-                    episodeJSON.description, 
-                    episodeJSON.guid 
-                );
-                if ( !( episode.getID() in channel.episodeIDs ) )
+            episodes.forEach( function( episodeXML, index, array ) {
+                var episodeJSON = scrapeEpisode( episodeXML );
+                var episode = new Episode.model( {
+                    title: episodeJSON.title, 
+                    link: episodeJSON.link,
+                    description: episodeJSON.description, 
+                    guid: episodeJSON.guid 
+                } );
+                if ( !channel.episodes( episode.getID() )  )
                 {
                     selectiveLog("adding episode to channel", logLevel.informational);
+                    episode._id = episode.getID;
                     channel.addEpisode(  
                         episode
                     );
