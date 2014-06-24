@@ -1,76 +1,64 @@
 var fs = require('fs'),
     xml2js = require('xml2js'),
     parseString = xml2js.parseString,
-    MongoClient = require('mongodb').MongoClient;
+    mongoose = require('mongoose');
 
 var config = require('./config'),
     selectiveLog = require('./logging'),
     logLevel = selectiveLog.logLevels;
 
-var ChannelFactory = require('./Channel'),
-    EpisodeFactory = require('./Episode'),
-    scrapeFactory = require('./scrape');
+var Channel = require('./Channel'),
+    Episode = require('./Episode'),
+    scrape = require('./scrape')(Channel, Episode);
 
-main();
+if (require.main === module) {
+    main();
+}
+
+function saveChannelWrapper(callback) {
+    var saveCount = 0;
+    return function saveChannel( channel ) {
+        saveCount++;
+        channel.save(function(err, data) {
+            if (err) throw err;
+            saveCount--;
+            if (!saveCount) {
+                return callback();
+            }
+        });
+    };
+}
+
+
+function doneScraping(err, channelList, callback) {
+    if (err) {
+        throw err;
+    }
+    channelList.forEach( saveChannelWrapper(callback) );
+}
 
 function main() {
-    MongoClient.connect( config.mongoURL, function(err,db) {
+
+    mongoose.connect(config.mongoURL);
+    
+    mongoose.connection.on('error', function (err) {
+      console.log('Could not connect to mongo server!');
+      console.log(err);
+      throw err;
+    });
+
+    fs.readFile( __dirname + '/test.xml', function( err, data ) {
         if (err) {
-            console.error("Error connecting to database");
-            throw err;
-        }
-
-        var Channel = ChannelFactory(db);
-        var Episode = EpisodeFactory(db);
-        var scrape = scrapeFactory(Channel, Episode);
-
-        function saveScraping( channel ) {
-
-            selectiveLog("channel ids: " + channel.episodeIDs, 2);
-            
-            channel.localEpisodes.forEach( function( episode, index, array ) {
-                //episodeCallbacks++;
-                selectiveLog("saving Episode", logLevel.informational);
-                Episode.save(episode, 
-                    //don't expect this to be called when no errors, I think the docs are lying to me
-                    function(err, data) {
-                        if (err) {
-                            console.warn(err);
-                            throw err;
-                        }
-                    }
-                );
-
-                channel.episodeIDs.push( episode.getID( ) );
-
-                selectiveLog("saving channel", logLevel.informational);
-                
-                //don't expect this to be called when no errors, I think the docs are lying to me
-                return Channel.save(channel, function(err) {
-                    if (err) {
-                        console.warn(err);
-                        throw err;
-                    } 
-                });
-            });
-        }
-
-        fs.readFile( __dirname + '/test.xml', function( err, data ) {
-            if (err) {
-                console.log("oops");
-            } else {
-                return scrape.scrapeSource(data, 
-                    function doneScraping(err, channelList) {
-                        if (err) {
-                            throw err;
-                        }
-                        channelList.forEach( saveScraping );
+            console.log("oops");
+        } else {
+            return scrape.scrapeSource(data, 
+                function mainDoneScrapingWrapper(err, data) {
+                    doneScraping(err, data, function doneSaving() {
                         process.exit();
-                    }
-                );
-            }
-        } );
-
+                    });
+                }
+            );
+        }
     } );
 }
 
