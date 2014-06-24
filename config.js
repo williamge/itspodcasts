@@ -1,3 +1,5 @@
+var minimistArgv = require('minimist')(process.argv.slice(2));
+
 function commandLineArguments() {
     var commandArguments = {
         /* Level of optional warnings to log (refer to logging.js for more accurate information)
@@ -10,14 +12,7 @@ function commandLineArguments() {
         warn_level : 1
     };
 
-    var warn_regex = /warn([0-9])/g,
-        regexResult;
-
-    process.argv.forEach( function( element, index, array ) {
-        if ( ( regexResult = warn_regex.exec( element ) ) !== null ) {
-            commandArguments.warn_level = regexResult[1];
-        }
-    } );
+    commandArguments.warn_level = minimistArgv.warn || commandArguments.warn_level;
 
     return commandArguments;
 }
@@ -30,20 +25,14 @@ function podcastXMLSource() {
         }
     ];
 
-    var inputRegex = /--input=(\S+)/g,
-        regexResult;
-
-    process.argv.forEach( function( element) {
-        if ( ( regexResult = inputRegex.exec( element ) ) !== null &&
-            regexResult[1] == "testRSS" ) {
-            XMLSource = [
-                {
-                    type : "rss",
-                    source: "http://feeds.feedburner.com/comedydeathrayradio?format=xml"
-                }
-            ];
-        }
-    } );
+    if (minimistArgv.input && minimistArgv.input == "testRSS") {
+        XMLSource = [
+            {
+                type : "rss",
+                source: "http://feeds.feedburner.com/comedydeathrayradio?format=xml"
+            }
+        ];
+    }
 
     return XMLSource;
 }
