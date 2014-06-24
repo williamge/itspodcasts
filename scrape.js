@@ -46,7 +46,6 @@ module.exports = function( Channel, Episode ) {
                 if ( !channel.episodes.id( episode.getID() )  )
                 {
                     selectiveLog("adding episode to channel", logLevel.informational);
-                    episode._id = episode.getID;
                     channel.addEpisode(  
                         episode
                     );
@@ -55,7 +54,7 @@ module.exports = function( Channel, Episode ) {
                 }
             } );
 
-            callback( err, channel );
+            return callback( err, channel );
         } );
     }
 
