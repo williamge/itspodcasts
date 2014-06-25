@@ -3,7 +3,7 @@ var fs = require('fs'),
     parseString = xml2js.parseString,
     mongoose = require('mongoose');
 
-var config = require('./config'),
+var configFromFile = require('./config'),
     selectiveLog = require('./logging'),
     logLevel = selectiveLog.logLevels;
 
@@ -12,7 +12,7 @@ var Channel = require('./Channel'),
     scrape = require('./scrape')(Channel, Episode);
 
 if (require.main === module) {
-    main();
+    main(configFromFile);
 }
 
 function saveChannelWrapper(callback) {
@@ -30,12 +30,12 @@ function saveChannelWrapper(callback) {
 }
 
 
-function doneScrapingSource(err, channelList, callback) {
+function finishScrapingSource(err, channelList, callback) {
     if (err) {
         throw err;
     }
-    var saveChannelInstance = saveChannelWrapper(callback);
-    channelList.forEach( saveChannelInstance );
+    var saveChannel = saveChannelWrapper(callback);
+    channelList.forEach( saveChannel );
 }
 
 function scrapeXML( err, data, callback ){
@@ -44,7 +44,7 @@ function scrapeXML( err, data, callback ){
     } else {
         return scrape.scrapeSource(data, 
             function mainDoneScrapingWrapper(err, data) {
-                doneScrapingSource(err, data, 
+                finishScrapingSource(err, data, 
                     function doneSaving() {
                         return callback();
                     }
@@ -52,6 +52,16 @@ function scrapeXML( err, data, callback ){
             }
         );
     }
+}
+
+function readXMLFile(fileName, callback) {
+    fs.readFile( fileName, 
+        function( err, data ) {
+            scrapeXML(err, data, 
+               callback
+            );
+        }
+    );
 }
 
 function requestRSS(feedURL, callback) {
@@ -69,11 +79,11 @@ function requestRSS(feedURL, callback) {
     );
 }
 
-function doneScrapingAll (err, data) {
+function scrapingComplete (err) {
     process.exit();
 }
 
-function main() {
+function main(config) {
 
     mongoose.connect(config.mongoURL);
     
@@ -83,24 +93,19 @@ function main() {
       throw err;
     });
 
-    //working on one source at a time in the prototype stage, 
-    //throw this in to a foreach loop when we're past prototyping
-    var prototypeXMLSource = config.XMLSource[0];
-
-    if (prototypeXMLSource.type == "file") {
-        fs.readFile( __dirname + '/test.xml', 
-            function( err, data ) {
-                scrapeXML(err, data, 
-                    doneScrapingAll
-                );
+    config.XMLSource.forEach(
+        function(source) {
+            switch (source.type) {
+                case "file":
+                    readXMLFile( source.source, scrapingComplete );
+                    break;
+                case "rss":
+                    requestRSS( source.source, scrapingComplete );
+                    break;
+                default:
+                    throw new Error("Unrecognized input source.");
             }
-        );
-    } else if (prototypeXMLSource.type == "rss") {
-        requestRSS(prototypeXMLSource.source,  
-                    doneScrapingAll
-            );
-    } else {
-        throw new Error("Unrecognized input source.");
-    }
+        }
+    );
 }
 

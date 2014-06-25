@@ -21,7 +21,7 @@ function podcastXMLSource() {
     var XMLSource = [
         {
             type : "file",
-            source: "test.xml"
+            source: __dirname + "/test.xml"
         }
     ];
 
