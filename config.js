@@ -33,6 +33,10 @@ function podcastXMLSource() {
             }
         ];
     }
+    
+    if (minimistArgv.sources) {
+        XMLSource = require(minimistArgv.sources);
+    }
 
     return XMLSource;
 }
