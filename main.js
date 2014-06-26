@@ -79,11 +79,19 @@ function requestRSS(feedURL, callback) {
     );
 }
 
-function scrapingComplete (err) {
-    process.exit();
-}
+
 
 function main(config) {
+
+    var workingSourcesCounter = 0;
+
+    function scrapingComplete (err) {
+        workingSourcesCounter--;
+        if (!workingSourcesCounter) {
+            process.exit();
+        }
+        
+    }
 
     mongoose.connect(config.mongoURL);
     
@@ -95,6 +103,8 @@ function main(config) {
 
     config.XMLSource.forEach(
         function(source) {
+            workingSourcesCounter++;
+            console.log(source);
             switch (source.type) {
                 case "file":
                     readXMLFile( source.source, scrapingComplete );
