@@ -1,4 +1,5 @@
 var fs = require('fs'),
+    request = require('request'),
     xml2js = require('xml2js'),
     parseString = xml2js.parseString,
     mongoose = require('mongoose');
@@ -65,7 +66,6 @@ function readXMLFile(fileName, callback) {
 }
 
 function requestRSS(feedURL, callback) {
-    var request = require('request');
     request(feedURL,
         function(err, response, body){
             if (!err && response.statusCode == 200) {
