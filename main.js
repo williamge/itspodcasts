@@ -31,45 +31,15 @@ function saveChannelWrapper(callback) {
 }
 
 
-function finishScrapingSource(err, channelList, callback) {
-    if (err) {
-        throw err;
-    }
-    var saveChannel = saveChannelWrapper(callback);
-    channelList.forEach( saveChannel );
-}
-
-function scrapeXML( err, data, callback ){
-    if (err) {
-        console.log("oops");
-    } else {
-        return scrape.scrapeSource(data, 
-            function mainDoneScrapingWrapper(err, data) {
-                finishScrapingSource(err, data, 
-                    function doneSaving() {
-                        return callback();
-                    }
-                );
-            }
-        );
-    }
-}
-
 function readXMLFile(fileName, callback) {
-    fs.readFile( fileName, 
-        function( err, data ) {
-            scrapeXML(err, data, 
-               callback
-            );
-        }
-    );
+    fs.readFile( fileName, callback );
 }
 
 function requestRSS(feedURL, callback) {
     request(feedURL,
         function(err, response, body){
             if (!err && response.statusCode == 200) {
-                scrapeXML(err, body, callback);
+                callback(err, body);
             } else if (err) {
                 throw err;
             } else {
@@ -79,7 +49,11 @@ function requestRSS(feedURL, callback) {
     );
 }
 
-
+function saveChannels(callback) {
+    return function(err, channelList){
+        channelList.forEach( saveChannelWrapper(callback) );
+    };
+}
 
 function main(config) {
 
@@ -89,9 +63,12 @@ function main(config) {
         workingSourcesCounter--;
         if (!workingSourcesCounter) {
             process.exit();
-        }
-        
+        }    
     }
+    function scrapeXML (err, data) {
+        scrape.scrapeSource(data, saveChannels(scrapingComplete) );
+    }
+
 
     mongoose.connect(config.mongoURL);
     
@@ -107,10 +84,10 @@ function main(config) {
             console.log(source);
             switch (source.type) {
                 case "file":
-                    readXMLFile( source.source, scrapingComplete );
+                    readXMLFile( source.source, scrapeXML );
                     break;
                 case "rss":
-                    requestRSS( source.source, scrapingComplete );
+                    requestRSS( source.source, scrapeXML );
                     break;
                 default:
                     throw new Error("Unrecognized input source.");
@@ -118,4 +95,12 @@ function main(config) {
         }
     );
 }
+
+module.exports = {
+    saveChannelWrapper: saveChannelWrapper,
+    saveChannels : saveChannels,
+    readXMLFile: readXMLFile,
+    requestRSS: requestRSS,
+    main: main
+};
 

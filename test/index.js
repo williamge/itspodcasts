@@ -1,6 +1,7 @@
 var ChannelSpec = require('./ChannelSpec'),
     scrapeSpec = require('./scrapeSpec'),
-    EpisodeSpec = require('./EpisodeSpec');
+    EpisodeSpec = require('./EpisodeSpec'),
+    mainSpec = require('./mainSpec');
 
 var mongoose = require('mongoose');
 
@@ -24,3 +25,4 @@ before( function(done) {
 ChannelSpec.run(dbURL);
 scrapeSpec.run(dbURL);
 EpisodeSpec.run(dbURL);
+mainSpec.run(dbURL);
