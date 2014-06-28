@@ -1,0 +1,14 @@
+[
+    {
+        "type" : "rss",
+        "source": "http://feeds.feedburner.com/comedydeathrayradio?format=xml"
+    },
+    {
+        "type" : "file",
+        "source": "./test.xml"
+    },
+    {
+        "type" : "rss",
+        "source": "http://allthingscomedy.com/rss/26"
+    }
+]
