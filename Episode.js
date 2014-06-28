@@ -5,6 +5,7 @@ var EpisodeSchema = mongoose.Schema( {
     title: String,
     link: String,
     description: String,
+    pubDate: Date,
     guid: String
 });
 

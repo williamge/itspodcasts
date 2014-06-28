@@ -12,12 +12,21 @@ module.exports = function( Channel, Episode ) {
      * @return {Episode}
      */
     function scrapeEpisode ( element ) {
-        return {
+        var episode =  {
             title: element.title[0],
             link: element.link[0],
-            description: ( element.description[0]._ || element.description[0] ),
-            guid: ( element.guid[0]._ || element.guid[0] )
+            description: ( element.description[0]._ || element.description[0] )
         };
+
+        if (element.pubDate) episode.pubDate = element.pubDate;
+
+        if (element.guid) {
+            episode.guid = element.guid[0]._ || element.guid[0];
+        }
+
+        return episode;
+
+        
     }
 
     /**
@@ -26,7 +35,7 @@ module.exports = function( Channel, Episode ) {
      * @param  {Function} callback [to be called after element is turned in to a Channel]  
      */
     function scrapeChannel ( channelXML, callback ) {
-        Channel.model.findOne( channelXML.title[0], function elementResult(err, channel) {
+        Channel.model.findOne( {title: channelXML.title[0]}, function elementResult(err, channel) {
             if (!channel) {
                 channel = new Channel.model( {
                     title: channelXML.title[0] 
