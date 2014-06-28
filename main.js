@@ -21,9 +21,11 @@ function saveChannelWrapper(callback) {
     return function saveChannel( channel ) {
         saveCount++;
         channel.save(function(err, data) {
-            if (err) throw err;
+            if (err) {
+                callback(err, data, channel);
+            }
             saveCount--;
-            if (!saveCount) {
+            if ( !(err || saveCount) ) {
                 return callback();
             }
         });
@@ -32,18 +34,31 @@ function saveChannelWrapper(callback) {
 
 
 function readXMLFile(fileName, callback) {
-    fs.readFile( fileName, callback );
+    fs.readFile( fileName, 
+        function(err, fileContents) {
+            if (err.code == "ENOENT") {
+                console.error("Aborting scraping source, could not open file: " + fileName);
+            } else {
+                return callback(err, fileContents);
+            }
+        }
+    ); 
 }
 
 function requestRSS(feedURL, callback) {
     request(feedURL,
         function(err, response, body){
-            if (!err && response.statusCode == 200) {
-                callback(err, body);
-            } else if (err) {
+            if (err) {
                 throw err;
-            } else {
-                throw new Error("who knows what happened here");
+            }
+            switch (response.statusCode) {
+                case 200:
+                    return callback(err, body);
+                case 404:
+                    console.error("Aborting scraping source, RSS feed could not be found (404): " + feedURL);
+                    break;
+                default:
+                    throw new Error("Unhandled requestRSS statusCode: " + response.statusCode);
             }
         }
     );
@@ -73,8 +88,8 @@ function main(config) {
     mongoose.connect(config.mongoURL);
     
     mongoose.connection.on('error', function (err) {
-      console.log('Could not connect to mongo server!');
-      console.log(err);
+      console.error('Could not connect to mongo server!');
+      console.error(err);
       throw err;
     });
 
