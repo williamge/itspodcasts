@@ -84,13 +84,12 @@ module.exports.run = function() {
                     main.readXMLFile(
                         (require('path')).resolve("test.xml"),
                         function verifyXMLData (err, XML) {
-                                console.log(err);
-                                        xml2js.parseString( XML, function( err, result ) {
-                                            expect(err).to.not.be.ok;
-                                            expect(result).to.have.property('rss');
-                                            done();
-                                        });
-                                    }    
+                            xml2js.parseString( XML, function( err, result ) {
+                                expect(err).to.not.be.ok;
+                                expect(result).to.have.property('rss');
+                                done();
+                            });
+                        }    
                     );
                 } 
             );
