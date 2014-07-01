@@ -5,7 +5,7 @@ var ChannelSpec = require('./ChannelSpec'),
 
 var mongoose = require('mongoose');
 
-var dbURL = 'mongodb://localhost/TEST-podcasts';
+var dbURL = process.env.MONGOTEST_URI || 'mongodb://localhost/TEST-podcasts';
 
 before( function(done) {
     mongoose.connect(dbURL, function(err) {
