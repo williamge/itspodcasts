@@ -144,46 +144,50 @@ function scrapeController(err, data, callback) {
 
 function main(config) {
 
-    mongoose.connect(config.mongoURL);
-    
-    mongoose.connection.on('error', function (err) {
-      console.error('Could not connect to mongo server!');
-      console.error(err);
-      throw err;
-    });
+    if (!config.XMLSource.length) {
+        console.warn("No sources defined, exiting program.");
+    } else {
+        mongoose.connect(config.mongoURL);
+        
+        mongoose.connection.on('error', function (err) {
+          console.error('Could not connect to mongo server!');
+          console.error(err);
+          throw err;
+        });
 
-    async.each(
-        config.XMLSource,
-        /**
-         * Called for each source provided as input to scrape.
-         * @param  source   A source object to scrape
-         * @param  {doneCallback} done   Callback that is called when scraping is complete, or on an error.
-         */
-        function mainIterator (source, done) {
-            console.log(source);
-            switch (source.type) {
-                case "file":
-                    readXMLFile( source.source, scrapeController, done );
-                    break;
-                case "rss":
-                    requestRSS( source.source, scrapeController, done );
-                    break;
-                default:
-                    throw new Error("Unrecognized input source.");
+        async.each(
+            config.XMLSource,
+            /**
+             * Called for each source provided as input to scrape.
+             * @param  source   A source object to scrape
+             * @param  {doneCallback} done   Callback that is called when scraping is complete, or on an error.
+             */
+            function mainIterator (source, done) {
+                console.log(source);
+                switch (source.type) {
+                    case "file":
+                        readXMLFile( source.source, scrapeController, done );
+                        break;
+                    case "rss":
+                        requestRSS( source.source, scrapeController, done );
+                        break;
+                    default:
+                        throw new Error("Unrecognized input source.");
+                }
+            },
+            /**
+             * Called when each source has completed scraping, or on an error. 
+             * @param  {Error} err   Error encountered, if any  
+             */
+            function mainComplete(err){
+                if (err) {
+                    throw err;
+                } else {
+                    scrapingComplete();
+                }
             }
-        },
-        /**
-         * Called when each source has completed scraping, or on an error. 
-         * @param  {Error} err   Error encountered, if any  
-         */
-        function mainComplete(err){
-            if (err) {
-                throw err;
-            } else {
-                scrapingComplete();
-            }
-        }
-    );
+        );
+    }
 }
 
 module.exports = {

@@ -18,20 +18,20 @@ function commandLineArguments() {
 }
 
 function podcastXMLSource() {
-    var XMLSource = [
-        {
-            type : "file",
-            source: __dirname + "/test.xml"
-        }
-    ];
+    var XMLSource = [];
 
-    if (minimistArgv.input && minimistArgv.input == "testRSS") {
-        XMLSource = [
-            {
-                type : "rss",
-                source: "http://feeds.feedburner.com/comedydeathrayradio?format=xml"
-            }
-        ];
+    if (minimistArgv.rss){
+        XMLSource.push({
+            type: "rss",
+            source: minimistArgv.rss
+        });
+    }
+
+    if (minimistArgv.file){
+        XMLSource.push({
+            type: "file",
+            source: minimistArgv.file
+        });
     }
     
     if (minimistArgv.sources) {
