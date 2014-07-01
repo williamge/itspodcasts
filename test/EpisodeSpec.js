@@ -21,7 +21,18 @@ module.exports.run = function(dbURL) {
 
     describe( 'Episode', function() {
         describe( '#new', function() {
-            it( 'should set up an Episode object' );
+            it( 'should set up an Episode object' , 
+                function() {
+                    var episode = new Episode.model({
+                        title : 'test title', 
+                        link : 'link',
+                        description : 'description',
+                        guid : 'guid'
+                    });
+                    expect(episode).to.have.property('title')
+                        .equal('test title');
+                }
+            );
         } );
         describe( '#find()', function() {
 

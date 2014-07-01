@@ -27,7 +27,15 @@ module.exports.run = function() {
 
     describe( 'Channel', function() {
         describe( '#new', function() {
-            it( 'should set up a Channel object' );
+            it( 'should set up a Channel object' ,
+                function() {
+                    var channel = new Channel.model({
+                        title: 'test channel' 
+                    });
+                    expect(channel).to.have.property('title')
+                        .equal('test channel');
+                }
+            );
         } );
         describe( '#find()', function() {
 
