@@ -1,0 +1,1 @@
+scraper: node src/main.js
