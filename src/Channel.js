@@ -6,10 +6,19 @@ var ChannelSchema = mongoose.Schema( {
     episodes: [ Episode.schema ]
 });
 
+/**
+ * Returns a unique identifier for the current Channel
+ * @return {String} Unique ID for the Channel
+ */
 ChannelSchema.methods.getID = function() {
     return this.title;
 };
 
+/**
+ * Adds an Episode to the list of Episode objects for the current Channel. Also keeps track of the Episode objects added to the Channel since being 
+ * created or retrieved, whichever action happened last.
+ * @param {Episode} episode Episode to be added to the current Channel
+ */
 ChannelSchema.methods.addEpisode = function(episode) {
     if (!(episode instanceof Episode.model)) {
         throw new TypeError("Passed episode not of type Episode");
