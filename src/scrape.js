@@ -8,9 +8,9 @@ var selectiveLog = require('./logging'),
 module.exports = function( Channel, Episode ) {
 
     /**
-     * 
-     * @param  {XML-DOM object corresponding to an 'item' element from an RSS feed} element
-     * @return {Episode}
+     * Returns an object with the scraped values of an 'episode' from an item XML tag from a podcast RSS feed
+     * @param  element An XML-DOM object corresponding to an 'item' element from an RSS feed
+     * @return {Object} An object with the scraped values of the episode in element
      */
     function scrapeEpisode ( element ) {
         var episode =  {
@@ -25,15 +25,13 @@ module.exports = function( Channel, Episode ) {
             episode.guid = element.guid[0]._ || element.guid[0];
         }
 
-        return episode;
-
-        
+        return episode;        
     }
 
     /**
-     * 
-     * @param  {XML-DOM object corresponding to a 'channel' element from an RSS feed}   element
-     * @param  {Function} callback [to be called after element is turned in to a Channel]  
+     * Scrapes a Channel object and passes it in to callback
+     * @param  element XML-DOM object corresponding to a 'channel' element from an RSS feed
+     * @param  {scrapedChannelCallback} callback Called after element is turned in to a Channel or with an error
      */
     function scrapeChannel ( channelXML, callback ) {
         Channel.model.findOne( {title: channelXML.title[0]}, function elementResult(err, channel) {
@@ -46,13 +44,7 @@ module.exports = function( Channel, Episode ) {
             var episodes = channelXML.item;
 
             episodes.forEach( function( episodeXML, index, array ) {
-                var episodeJSON = scrapeEpisode( episodeXML );
-                var episode = new Episode.model( {
-                    title: episodeJSON.title, 
-                    link: episodeJSON.link,
-                    description: episodeJSON.description, 
-                    guid: episodeJSON.guid 
-                } );
+                var episode = new Episode.model( scrapeEpisode( episodeXML ) );
                 if ( !channel.episodes.id( episode.getID() )  )
                 {
                     selectiveLog("adding episode to channel", logLevel.informational);
@@ -68,6 +60,11 @@ module.exports = function( Channel, Episode ) {
         } );
     }
 
+    /**
+     * Scrapes an RSS XML document and passes a list of scraped Channels to a callback or any errors
+     * @param  element XML-DOM object corresponding to a 'channel' element from an RSS feed
+     * @param  {scrapedSourceCallback} callback Called after a source is scraped and a list of Channel objects is populated
+     */
     function scrapeSource ( data, callback ) {
         var channelList = [];
         var channelScrapers = 0;
