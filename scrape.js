@@ -1,4 +1,5 @@
 var xml2js = require('xml2js'),
+    async = require('async'),
     parseString = xml2js.parseString;
 
 var selectiveLog = require('./logging'),
@@ -74,18 +75,28 @@ module.exports = function( Channel, Episode ) {
             if (err) {
                 return callback(err);
             } else {
-                result.rss.channel.forEach( function( element, index, array ) {
-
-                    channelScrapers++;
-
-                    scrapeChannel( element, function withChannel( err, channel) {
-                        channelList.push( channel );
-                        channelScrapers--;
-                        if (channelScrapers === 0) {
-                            return callback(err, channelList );
+                async.each( 
+                    result.rss.channel, 
+                    function eachIterator(channel, done) {
+                        scrapeChannel(channel, 
+                            function withChannel( err, channel) {
+                                if (err){
+                                    return done(err);
+                                } else {
+                                    channelList.push( channel );
+                                    return done();
+                                }
+                            }
+                        );
+                    },
+                    function eachFinally (err) {
+                        if (err){
+                            return callback(err);
+                        } else {
+                            return callback(null, channelList);
                         }
-                    } );
-                } );
+                    }
+                );
             }
         });
     }

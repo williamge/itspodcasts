@@ -12,7 +12,12 @@ var failPointCommand = function(failPoint, mode) {
     }; 
 };
 
+var runCommand = function (mongoose, command, callback) {
+    mongoose.connection.db.admin().command(command, callback);
+};
+
 module.exports = {
     socketExceptionCommand: socketExceptionCommand,
-    failPointCommand: failPointCommand
+    failPointCommand: failPointCommand,
+    runCommand: runCommand
 };
