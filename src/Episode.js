@@ -1,3 +1,5 @@
+/** @module Channel */
+
 var mongoose = require('mongoose');
 
 var EpisodeSchema = mongoose.Schema( {

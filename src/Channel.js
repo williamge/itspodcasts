@@ -1,3 +1,5 @@
+/** @module Channel */
+
 var mongoose = require('mongoose'),
     Episode = require('./Episode');
 

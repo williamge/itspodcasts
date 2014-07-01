@@ -1,3 +1,5 @@
+/** @module scrape */
+
 var xml2js = require('xml2js'),
     async = require('async'),
     parseString = xml2js.parseString;
