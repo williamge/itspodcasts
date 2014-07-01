@@ -7,10 +7,8 @@ var mongoose = require('mongoose'),
 
 var testHelpers = require('./testHelpers');
 
-var main = require('../main'),
-    Channel = require('../Channel');
-   // Episode = require('../Episode');
-
+var main = require('../src/main'),
+    Channel = require('../src/Channel');
 
 module.exports.run = function() {
 
@@ -39,7 +37,7 @@ module.exports.run = function() {
             it( 'should scrape an XML file read from disk', 
                 function(done) {
                     main.readXMLFile(
-                        (require('path')).resolve("test.xml"),
+                        (require('path')).resolve("test/test.xml"),
                         function verifyXMLData (err, XML) {
                             xml2js.parseString( XML, function( err, result ) {
                                 expect(err).to.not.be.ok;

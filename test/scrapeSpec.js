@@ -2,18 +2,18 @@
 
 var expect = require('chai').expect;
 
-var Q = require('q');
-
 var xml2js = require('xml2js'),
     parseString = xml2js.parseString;
 
 var mongoose = require('mongoose');
 
-var Channel = require('../Channel'),
-    Episode = require('../Episode');
+var Channel = require('../src/Channel'),
+    Episode = require('../src/Episode');
 
-var scrapePackage = require('../scrape');
+var scrapePackage = require('../src/scrape');
 var scrape = scrapePackage(Channel, Episode);
+
+var Q = require('q');
 
 var test_xml_channel = Q.nfcall( 
     require('fs').readFile,

@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 
 var testHelpers = require('./testHelpers');
 
-var Episode = require('../Episode');
+var Episode = require('../src/Episode');
 
 
 module.exports.run = function(dbURL) {

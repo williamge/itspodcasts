@@ -5,7 +5,7 @@
     },
     {
         "type" : "file",
-        "source": "./test.xml"
+        "source": "./test/test.xml"
     },
     {
         "type" : "rss",

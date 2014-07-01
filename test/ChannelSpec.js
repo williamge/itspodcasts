@@ -6,8 +6,8 @@ var mongoose = require('mongoose');
 
 var testHelpers = require('./testHelpers');
 
-var Channel = require('../Channel'),
-    Episode = require('../Episode');
+var Channel = require('../src/Channel'),
+    Episode = require('../src/Episode');
 
 var Channel,
     db;
