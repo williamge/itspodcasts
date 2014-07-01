@@ -130,6 +130,22 @@ module.exports.run = function() {
                     expect(test_channel.episodes[0].title).to.equal('title');
                 }
             );
+
+            it( 'should throw an error if a non-episode object is passed', 
+                function() {
+                    expect(
+                        function addNonEpisode() {
+                            var test_channel = new Channel.model( { title: 'test channel' } );
+                            test_channel.addEpisode(  {
+                                title: 'title', 
+                                link:'link', 
+                                description:'description',
+                                guid: 'guid'
+                            } );
+                        }
+                    ).to.throw(TypeError);
+                }
+            );
         });
     });
 };

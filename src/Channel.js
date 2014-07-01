@@ -11,6 +11,9 @@ ChannelSchema.methods.getID = function() {
 };
 
 ChannelSchema.methods.addEpisode = function(episode) {
+    if (!(episode instanceof Episode.model)) {
+        throw new TypeError("Passed episode not of type Episode");
+    }
     this.episodes.push(episode);
     if (!this._addedEpisodes) {
         this._addedEpisodes = [episode];
