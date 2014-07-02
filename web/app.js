@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -28,20 +27,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+    app.use(express.errorHandler());
 }
 
 app.get('/', routes.index);
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+http.createServer(app).listen(app.get('port'), function() {
+    console.log('Express server listening on port ' + app.get('port'));
 
-  mongoose.connect(config.mongoURL);
+    mongoose.connect(config.mongoURL);
 
-  mongoose.connection.on('error', function (err) {
-    console.error('Could not connect to mongo server!');
-    console.error(err);
-    throw err;
-  });
+    mongoose.connection.on('error', function(err) {
+        console.error('Could not connect to mongo server!');
+        console.error(err);
+        throw err;
+    });
 
 });

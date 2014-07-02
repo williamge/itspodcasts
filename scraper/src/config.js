@@ -9,8 +9,8 @@ function commandLineArguments() {
              3 - normal warnings + (above)
              4 - all warnings + (above)
              5 - informational + (above)
-         */ 
-        warn_level : 1
+         */
+        warn_level: 1
     };
 
     commandArguments.warn_level = minimistArgv.warn || commandArguments.warn_level;
@@ -21,23 +21,23 @@ function commandLineArguments() {
 function podcastXMLSource() {
     var XMLSource = [];
 
-    if (minimistArgv.rss){
+    if (minimistArgv.rss) {
         XMLSource.push({
             type: "rss",
             source: minimistArgv.rss
         });
     }
 
-    if (minimistArgv.file){
+    if (minimistArgv.file) {
         XMLSource.push({
             type: "file",
             source: minimistArgv.file
         });
     }
-    
+
     if (minimistArgv.sources) {
         XMLSource = require(
-            path.resolve( minimistArgv.sources)
+            path.resolve(minimistArgv.sources)
         );
     }
 
@@ -46,6 +46,6 @@ function podcastXMLSource() {
 
 module.exports = {
     mongoURL: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/podcasts',
-    cmd_args : commandLineArguments(),
-    XMLSource : podcastXMLSource()
+    cmd_args: commandLineArguments(),
+    XMLSource: podcastXMLSource()
 };

@@ -23,13 +23,13 @@ var scrape = require('./src/scrape')(Channel, Episode),
  * @param {Error} err Error encountered during operation, if any
  */
 
- /**
-  * Callback that is run on each item in a list, expected as the second
-  * argument of async.each
-  * @callback eachCallback
-  * @param item item to perform an operation on
-  * @param {doneCallback} done callback to call when operations are done, or on error
-  */
+/**
+ * Callback that is run on each item in a list, expected as the second
+ * argument of async.each
+ * @callback eachCallback
+ * @param item item to perform an operation on
+ * @param {doneCallback} done callback to call when operations are done, or on error
+ */
 
 if (require.main === module) {
     main(configFromFile);
@@ -37,16 +37,16 @@ if (require.main === module) {
 
 function setUp(mongoURL) {
     mongoose.connect(mongoURL);
-    
-    mongoose.connection.on('error', function (err) {
-      console.error('Could not connect to mongo server!');
-      console.error(err);
-      throw err;
+
+    mongoose.connection.on('error', function(err) {
+        console.error('Could not connect to mongo server!');
+        console.error(err);
+        throw err;
     });
 }
 
 function tearDown() {
-    process.exit(); 
+    process.exit();
 }
 
 function main(config) {
@@ -58,10 +58,10 @@ function main(config) {
         processing.runOnSource(
             config.XMLSource,
             /**
-             * Called when each source has completed scraping, or on an error. 
-             * @param  {Error} err   Error encountered, if any  
+             * Called when each source has completed scraping, or on an error.
+             * @param  {Error} err   Error encountered, if any
              */
-            function mainComplete(err){
+            function mainComplete(err) {
                 if (err) {
                     throw err;
                 } else {
@@ -71,4 +71,3 @@ function main(config) {
         );
     }
 }
-

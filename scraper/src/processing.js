@@ -18,12 +18,12 @@ var Channel = require('../../models/Channel'),
 var scrape = require('./scrape')(Channel, Episode);
 
 /**
- * Saves a {Channel} object and calls the 'done' callback when the Channel object has been saved or there has 
+ * Saves a {Channel} object and calls the 'done' callback when the Channel object has been saved or there has
  * been an error.
  * @param  {Channel}   channel Channel to be saved
- * @param  {doneCallback} done    Callback to be called when the Channel is saved or on an error 
+ * @param  {doneCallback} done    Callback to be called when the Channel is saved or on an error
  */
-function saveChannel( channel, done ) {
+function saveChannel(channel, done) {
     channel.save(function(err, data) {
         if (err) {
             return done(err);
@@ -39,20 +39,20 @@ function saveChannel( channel, done ) {
  * @param  {doneCallback} done     'done' callback that will be passed on to the callback
  */
 function readXMLFile(fileName, callback, done) {
-    fs.readFile( 
-        path.resolve(fileName), 
+    fs.readFile(
+        path.resolve(fileName),
         function(err, fileContents) {
             if (err && err.code == "ENOENT") {
-                return callback( 
-                    new Error("Aborting scraping source, could not open file: " + fileName), 
-                    null, 
+                return callback(
+                    new Error("Aborting scraping source, could not open file: " + fileName),
+                    null,
                     done
                 );
             } else {
                 return callback(err, fileContents, done);
             }
         }
-    ); 
+    );
 }
 
 /**
@@ -63,7 +63,7 @@ function readXMLFile(fileName, callback, done) {
  */
 function requestRSS(feedURL, callback, done) {
     request(feedURL,
-        function(err, response, body){
+        function(err, response, body) {
             if (err) {
                 return callback(err, null, done);
             }
@@ -73,7 +73,7 @@ function requestRSS(feedURL, callback, done) {
                 case 404:
                     return callback(
                         new Error("Aborting scraping source, RSS feed could not be found (404): " + feedURL),
-                        null, 
+                        null,
                         done
                     );
                 default:
@@ -88,21 +88,21 @@ function requestRSS(feedURL, callback, done) {
  * @callback doneCallback
  * @param  {Function} err Error on scraping if there were any
  */
-function scrapingComplete (err) {
+function scrapingComplete(err) {
     if (err) throw err;
-    process.exit(); 
+    process.exit();
 }
 
 /**
- * Scrapes an RSS feed passed in as a string and calls the channelFunction on the 
- * scraped channels. After the channelFunction has finished running on all channels 
+ * Scrapes an RSS feed passed in as a string and calls the channelFunction on the
+ * scraped channels. After the channelFunction has finished running on all channels
  * the callback is called.
  * @param  {string}   data  XML data in a string to be scraped
  * @param  {eachCallback}   channelFunction callback to be run on each scraped channel
  * @param  {doneCallback} callback        callback to be run after all channelFunction instances have finished running
  */
-function scrapeXML (data, channelFunction, callback) {
-    scrape.scrapeSource(data, 
+function scrapeXML(data, channelFunction, callback) {
+    scrape.scrapeSource(data,
         function(err, channelList) {
             async.each(
                 channelList,
@@ -136,14 +136,14 @@ function runOnSource(sources, callback) {
          * @param  source   A source object to scrape
          * @param  {doneCallback} done   Callback that is called when scraping is complete, or on an error.
          */
-        function mainIterator (source, done) {
+        function mainIterator(source, done) {
             console.log(source);
             switch (source.type) {
                 case "file":
-                    readXMLFile( source.source, scrapeController, done );
+                    readXMLFile(source.source, scrapeController, done);
                     break;
                 case "rss":
-                    requestRSS( source.source, scrapeController, done );
+                    requestRSS(source.source, scrapeController, done);
                     break;
                 default:
                     throw new Error("Unrecognized input source.");
@@ -161,4 +161,3 @@ module.exports = {
     scrapeXML: scrapeXML,
     runOnSource: runOnSource
 };
-
