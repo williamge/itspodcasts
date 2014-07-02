@@ -7,8 +7,8 @@ var mongoose = require('mongoose'),
 
 var testHelpers = require('./testHelpers');
 
-var main = require('../src/main'),
-    Channel = require('../src/Channel');
+var main = require('../scraper/src/processing'),
+    Channel = require('../scraper/src/Channel');
 
 
 beforeEach(function(done) {

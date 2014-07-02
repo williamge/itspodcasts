@@ -1,4 +1,5 @@
-var minimistArgv = require('minimist')(process.argv.slice(2));
+var minimistArgv = require('minimist')(process.argv.slice(2)),
+    path = require('path');
 
 function commandLineArguments() {
     var commandArguments = {
@@ -35,7 +36,9 @@ function podcastXMLSource() {
     }
     
     if (minimistArgv.sources) {
-        XMLSource = require(minimistArgv.sources);
+        XMLSource = require(
+            path.resolve( minimistArgv.sources)
+        );
     }
 
     return XMLSource;
