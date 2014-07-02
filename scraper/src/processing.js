@@ -17,20 +17,6 @@ var Channel = require('./Channel'),
     scrape = require('./scrape')(Channel, Episode);
 
 /**
- * Callback that is run at the end of a series of operations
- * @callback doneCallback
- * @param {Error} err Error encountered during operation, if any
- */
-
- /**
-  * Callback that is run on each item in a list, expected as the second
-  * argument of async.each
-  * @callback eachCallback
-  * @param item item to perform an operation on
-  * @param {doneCallback} done callback to call when operations are done, or on error
-  */
-
-/**
  * Saves a {Channel} object and calls the 'done' callback when the Channel object has been saved or there has 
  * been an error.
  * @param  {Channel}   channel Channel to be saved
