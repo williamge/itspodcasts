@@ -1,6 +1,7 @@
 /** @module Channel */
 
 var fs = require('fs'),
+    path = require('path'),
     async = require('async'),
     request = require('request'),
     xml2js = require('xml2js'),
@@ -51,7 +52,8 @@ function saveChannel( channel, done ) {
  * @param  {doneCallback} done     'done' callback that will be passed on to the callback
  */
 function readXMLFile(fileName, callback, done) {
-    fs.readFile( fileName, 
+    fs.readFile( 
+        path.resolve(fileName), 
         function(err, fileContents) {
             if (err && err.code == "ENOENT") {
                 return callback( 
@@ -133,6 +135,7 @@ function scrapeXML (data, channelFunction, callback) {
 function scrapeController(err, data, callback) {
     if (err) {
         console.error(err);
+        callback(err);
     } else {
         scrapeXML(data, saveChannel, callback);
     }
