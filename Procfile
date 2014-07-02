@@ -1,1 +1,1 @@
-scraper: node src/main.js
+scraper: npm run scraper

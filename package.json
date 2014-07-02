@@ -1,8 +1,9 @@
 {
-    "name" : "itspodcasts-scraper",
+    "name" : "itspodcasts",
     "version" : "0.0.1",
     "scripts" : {
-        "test" : "mocha test"
+        "test" : "mocha test",
+        "scraper": "node scraper/index.js"
     },
     "dependencies" : {
         "xml2js" : "~0.4.3",
