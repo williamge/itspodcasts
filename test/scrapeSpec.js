@@ -20,92 +20,90 @@ var test_xml_channel = Q.nfcall(
     __dirname + '/data/test_channel.xml'
 );
 
-module.exports.run = function(dbURL) {
 
-    beforeEach(function(done) {
-        mongoose.connection.db.dropDatabase(done);
-    });
+beforeEach(function(done) {
+    mongoose.connection.db.dropDatabase(done);
+});
 
-    after(function(done) {
-        mongoose.connection.db.dropDatabase(done);
-    });
+after(function(done) {
+    mongoose.connection.db.dropDatabase(done);
+});
 
-    describe('scrape', function() {
+describe('scrape', function() {
 
-        var xml, xml_channel, xml_episode;
+    var xml, xml_channel, xml_episode;
 
-        before( function( done ) {
+    before( function( done ) {
 
-            test_xml_channel.then( function( xmlFS ) {
-              
+        test_xml_channel.then( function( xmlFS ) {
+          
 
-                xml2js.parseString( xmlFS, function( err, xmlDom ) {
+            xml2js.parseString( xmlFS, function( err, xmlDom ) {
 
-                    if (err) {
-                        console.error("Error in parsing XML");
-                        console.error( err );
-                    } else {
-                        try {
-                            xml = xmlFS;
-                            xml_channel = xmlDom.rss.channel[0];
-                            xml_episode = xml_channel.item[0];
-                            done();
-                        }
-                        catch (e) {
-                            console.error("Error while accesing XML DOM");
-                            console.error( e );
-                        }
+                if (err) {
+                    console.error("Error in parsing XML");
+                    console.error( err );
+                } else {
+                    try {
+                        xml = xmlFS;
+                        xml_channel = xmlDom.rss.channel[0];
+                        xml_episode = xml_channel.item[0];
+                        done();
                     }
-                });
-            } )
-            .catch( function( err ) {
-                console.error("Error loading test data from file.");
-                console.error(err);
-            } );
+                    catch (e) {
+                        console.error("Error while accesing XML DOM");
+                        console.error( e );
+                    }
+                }
+            });
+        } )
+        .catch( function( err ) {
+            console.error("Error loading test data from file.");
+            console.error(err);
         } );
+    } );
 
-        describe( '#scrapeEpisode()', function() {
-            it( 'should return an episode object', function() {
-                var episode = scrape.scrapeEpisode( xml_episode );
-                expect(episode).to.have.property("title");
-            });
-        });
-
-        describe( '#scrapeChannel()', function() {
-            it( 'should return a Channel object', function(done) {
-                scrape.scrapeChannel( xml_channel, function(err, channel) {
-                    expect(channel).to.have.property("title").equal("test title");
-                    done();
-                } );
-            });
-        });
-
-        describe( '#scrapeChannel()', function() {
-            it( 'should return the correct Channel if there are more than one in the database', function(done) {
-                (new Channel.model( {title: "not the same title as below, different channel"} )).save(
-                    function(err, data) {
-                        scrape.scrapeChannel( xml_channel, function(err, channel) {
-                            expect(channel).to.have.property("title").equal("test title");
-                            done();
-                        } );
-                    }
-                );
-
-            });
-        });
-
-        describe( '#scrapeSource()', function() {
-            it( 'should return a list of channels', function( done ) {
-                
-                scrape.scrapeSource( xml, function(err, channelList) {
-                    expect(channelList).to.have.length(1);
-                    channelList.forEach( function(element, index, array) {
-                        expect(element).to.have.property("title");
-                        expect(element).to.be.an.instanceOf(Channel.model);
-                    } );
-                    done();
-                } );
-            });
+    describe( '#scrapeEpisode()', function() {
+        it( 'should return an episode object', function() {
+            var episode = scrape.scrapeEpisode( xml_episode );
+            expect(episode).to.have.property("title");
         });
     });
-};
+
+    describe( '#scrapeChannel()', function() {
+        it( 'should return a Channel object', function(done) {
+            scrape.scrapeChannel( xml_channel, function(err, channel) {
+                expect(channel).to.have.property("title").equal("test title");
+                done();
+            } );
+        });
+    });
+
+    describe( '#scrapeChannel()', function() {
+        it( 'should return the correct Channel if there are more than one in the database', function(done) {
+            (new Channel.model( {title: "not the same title as below, different channel"} )).save(
+                function(err, data) {
+                    scrape.scrapeChannel( xml_channel, function(err, channel) {
+                        expect(channel).to.have.property("title").equal("test title");
+                        done();
+                    } );
+                }
+            );
+
+        });
+    });
+
+    describe( '#scrapeSource()', function() {
+        it( 'should return a list of channels', function( done ) {
+            
+            scrape.scrapeSource( xml, function(err, channelList) {
+                expect(channelList).to.have.length(1);
+                channelList.forEach( function(element, index, array) {
+                    expect(element).to.have.property("title");
+                    expect(element).to.be.an.instanceOf(Channel.model);
+                } );
+                done();
+            } );
+        });
+    });
+});

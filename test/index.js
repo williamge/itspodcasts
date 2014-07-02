@@ -21,8 +21,3 @@ before( function(done) {
     });
 
 } );
-
-ChannelSpec.run(dbURL);
-scrapeSpec.run(dbURL);
-EpisodeSpec.run(dbURL);
-mainSpec.run(dbURL);

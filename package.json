@@ -1,10 +1,12 @@
 {
     "name" : "itspodcasts-scraper",
     "version" : "0.0.1",
+    "scripts" : {
+        "test" : "mocha test"
+    },
     "dependencies" : {
         "xml2js" : "~0.4.3",
         "mongodb" : "~1.4.4",
-        "q": "~1.0.1",
         "mongoose" : "~3.8.12",
         "request" : "~2.36.0",
         "minimist" : "~0.2.0",
@@ -12,6 +14,7 @@
     },
     "devDependencies" : {
         "chai" : "*",
-        "mocha" : "~1.19.0"
+        "mocha" : "~1.19.0",
+        "q": "~1.0.1"
     }
 }
