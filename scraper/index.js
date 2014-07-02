@@ -11,9 +11,10 @@ var configFromFile = require('./src/config'),
     selectiveLog = require('./src/logging'),
     logLevel = selectiveLog.logLevels;
 
-var Channel = require('./src/Channel'),
-    Episode = require('./src/Episode'),
-    scrape = require('./src/scrape')(Channel, Episode),
+var Channel = require('../models/Channel'),
+    Episode = require('../models/Episode');
+
+var scrape = require('./src/scrape')(Channel, Episode),
     processing = require('./src/processing.js');
 
 /**

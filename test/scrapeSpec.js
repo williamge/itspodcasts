@@ -7,8 +7,8 @@ var xml2js = require('xml2js'),
 
 var mongoose = require('mongoose');
 
-var Channel = require('../scraper/src/Channel'),
-    Episode = require('../scraper/src/Episode');
+var Channel = require('../models/Channel'),
+    Episode = require('../models/Episode');
 
 var scrapePackage = require('../scraper/src/scrape');
 var scrape = scrapePackage(Channel, Episode);

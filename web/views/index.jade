@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1= title
+  ul
+    each channel, i in channels
+        li 
+            span=channel.title
+                ul
+                    each episode, j in channel.episodes
+                        li=episode.title

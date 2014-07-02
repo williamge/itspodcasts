@@ -1,9 +1,11 @@
 {
     "name" : "itspodcasts",
     "version" : "0.0.1",
+    "private": true,
     "scripts" : {
         "test" : "mocha test",
-        "scraper": "node scraper/index.js"
+        "scraper" : "node scraper/index.js",
+        "web" : "node web/app.js"
     },
     "dependencies" : {
         "xml2js" : "~0.4.3",
@@ -11,7 +13,9 @@
         "mongoose" : "~3.8.12",
         "request" : "~2.36.0",
         "minimist" : "~0.2.0",
-        "async" : "~0.9.0"
+        "async" : "~0.9.0",
+        "express": "~3.4.8",
+        "jade": "*"
     },
     "devDependencies" : {
         "chai" : "*",

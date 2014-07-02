@@ -12,9 +12,10 @@ var configFromFile = require('./config'),
     selectiveLog = require('./logging'),
     logLevel = selectiveLog.logLevels;
 
-var Channel = require('./Channel'),
-    Episode = require('./Episode'),
-    scrape = require('./scrape')(Channel, Episode);
+var Channel = require('../../models/Channel'),
+    Episode = require('../../models/Episode');
+
+var scrape = require('./scrape')(Channel, Episode);
 
 /**
  * Saves a {Channel} object and calls the 'done' callback when the Channel object has been saved or there has 

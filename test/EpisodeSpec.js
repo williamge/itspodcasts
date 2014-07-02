@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 
 var testHelpers = require('./testHelpers');
 
-var Episode = require('../scraper/src/Episode');
+var Episode = require('../models/Episode');
 
 
 beforeEach(function(done) {
