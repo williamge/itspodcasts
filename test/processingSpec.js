@@ -1,16 +1,33 @@
 /*jshint expr: true*/
 
-var expect = require('chai').expect;
+var expect = require('chai').expect,
+    sinon = require('sinon');
 
 var mongoose = require('mongoose'),
-    xml2js = require('xml2js');
+    xml2js = require('xml2js'),
+    fs = require('fs'),
+    path = require('path');
 
 var testHelpers = require('./testHelpers');
 
 var processing = require('../scraper/src/processing');
 
-var Channel = require('../models/Channel');
+var Channel = require('../models/Channel'),
+    request = require('request');
 
+var testXML;
+
+before(function(done) {
+    fs.readFile(
+        path.resolve("test/test.xml"),
+        function(err, XML) {
+            if (err) throw err;
+
+            testXML = XML;
+            done();
+        }
+    );
+});
 
 beforeEach(function(done) {
     mongoose.connection.db.dropDatabase();
@@ -37,7 +54,7 @@ describe( 'processing', function() {
         it( 'should scrape an XML file read from disk', 
             function(done) {
                 processing.readXMLFile(
-                    (require('path')).resolve("test/test.xml"),
+                    path.resolve("test/test.xml"),
                     function verifyXMLData (err, XML) {
                         xml2js.parseString( XML, function( err, result ) {
                             expect(err).to.not.be.ok;
@@ -64,10 +81,37 @@ describe( 'processing', function() {
         );
     } );
     describe( '#requestRSS', function() {
+
+        var requestStub;
+
+        before(function() {
+            sinon.stub(request, 'get')
+                .withArgs("http://www.success.com")
+                .yields(
+                    null,
+                    {
+                        statusCode: 200
+                    },
+                    testXML
+                )
+                .withArgs("http://www.notfound.com")
+                .yields(
+                    null,
+                    {
+                        statusCode: 404
+                    },
+                    testXML
+                );
+        });
+
+        after (function() {
+            request.get.restore();
+        });
+
         it( 'should scrape an XML file requested via http', 
             function(done) {
                 processing.requestRSS(
-                    "http://feeds.feedburner.com/comedydeathrayradio?format=xml",
+                    "http://www.success.com",
                     _verifyXMLData(done)
                 );
             } 
@@ -75,7 +119,7 @@ describe( 'processing', function() {
         it( 'should allow the callback to handle errors',
             function(done) {
                 processing.requestRSS(
-                    "http://google.com/googlepleasedontmakethisapage",
+                    "http://www.notfound.com",
                     function verifyError(err, XML, doneFlag) {
                         expect(err).to.have.property('message')
                             .that.has.string('could not be found');

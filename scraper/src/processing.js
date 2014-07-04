@@ -62,7 +62,7 @@ function readXMLFile(fileName, callback, done) {
  * @param  {doneCallback} done     'done' callback that will be passed on to the callback
  */
 function requestRSS(feedURL, callback, done) {
-    request(feedURL,
+    request.get(feedURL,
         function(err, response, body) {
             if (err) {
                 return callback(err, null, done);
