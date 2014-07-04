@@ -1,5 +1,7 @@
 #itspodcasts
 
+[![Build Status](https://travis-ci.org/williamge/itspodcasts.svg?branch=master)](https://travis-ci.org/williamge/itspodcasts)
+
 A website that keeps track of various podcast RSS feeds and consolidates them in one source.
 
 Live site can be found at [http://itspodcasts.herokuapp.com/](http://itspodcasts.herokuapp.com/)
