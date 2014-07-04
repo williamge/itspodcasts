@@ -59,18 +59,22 @@ describe( 'Episode', function() {
         );
 
         describe('should propagate errors', function() {
-            it('database error', function(done) {
-                mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
-                    expect(err.message, 
-                        'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
-                        ).to.have.string("connection closed");
-                } );
-                
-                Episode.model.find( { _id :'anything' },  function( err, data ){
-                    expect(err).to.be.ok;
-                    done();
+            if ( testHelpers.mongoTestCommandsEnabled() ) {
+                it('database error', function(done) {
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
+                    
+                    Episode.model.find( { _id :'anything' },  function( err, data ){
+                        expect(err).to.be.ok;
+                        done();
+                    });
                 });
-            });
+            } else {
+                it('skipped database error check - enableTestCommands not set for MongoDB instance');
+            }
         });
 
     });
@@ -78,25 +82,29 @@ describe( 'Episode', function() {
     describe( '#save()', function() {
 
         describe('should propagate errors', function() {
-            it('database error', function(done) {
-                mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
-                    expect(err.message, 
-                        'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
-                        ).to.have.string("connection closed");
-                } );
+            if ( testHelpers.mongoTestCommandsEnabled() ) {
+                it('database error', function(done) {
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
 
-                ( new Episode.model({
-                    channel: "channel",
-                    title: "title returns error",
-                    guid: "guid"
-                }))
-                .save( 
-                    function(err, data ){
-                        expect(err).to.be.ok;
-                        done(); 
-                    }
-                );
-            });
+                    ( new Episode.model({
+                        channel: "channel",
+                        title: "title returns error",
+                        guid: "guid"
+                    }))
+                    .save( 
+                        function(err, data ){
+                            expect(err).to.be.ok;
+                            done(); 
+                        }
+                    );
+                });
+            } else {
+                it('skipped database error check - enableTestCommands not set for MongoDB instance');
+            }
         });
 
         it( 'should save an Episode' , 

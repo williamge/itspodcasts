@@ -22,7 +22,7 @@ after(function(done) {
     done();
 });
 
-describe( 'main', function() {
+describe( 'processing', function() {
     function _verifyXMLData(done) {
        return function verifyXMLData (err, XML) {
             xml2js.parseString( XML, function( err, result ) {
@@ -103,28 +103,32 @@ describe( 'main', function() {
             } 
         );
 
-        it( 'should allow the callback to handle errors',
-            function(done) {
+        if ( testHelpers.mongoTestCommandsEnabled() ) {
+            it( 'should allow the callback to handle errors',
+                function(done) {
 
-                testHelpers.runCommand(
-                    mongoose,
-                    testHelpers.socketExceptionCommand(1),
-                    function(err, commandInfo) {
-                        expect(
-                            err.message, 
-                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
-                        ).to.have.string("connection closed");
-                    }
-                );
+                    testHelpers.runCommand(
+                        mongoose,
+                        testHelpers.socketExceptionCommand(1),
+                        function(err, commandInfo) {
+                            expect(
+                                err.message, 
+                                'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                        }
+                    );
 
-                main.saveChannel(new Channel.model( { title: "test title1" }),
-                    function(err) {
-                        expect(err).to.be.ok;
-                        done();
-                    }
-                );
-            } 
-         );
+                    main.saveChannel(new Channel.model( { title: "test title1" }),
+                        function(err) {
+                            expect(err).to.be.ok;
+                            done();
+                        }
+                    );
+                } 
+             );
+        } else {
+            it('skipped database error check - enableTestCommands not set for MongoDB instance');
+        }
     } );
 });
 

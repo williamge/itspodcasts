@@ -38,21 +38,26 @@ describe( 'Channel', function() {
     describe( '#find()', function() {
 
         describe('should propagate errors', function() {
-            it('database error', function(done) {
 
-                mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
-                    expect(err.message, 
-                        'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
-                        ).to.have.string("connection closed");
-                } );
-                
-                Channel.model.find("title returns error", 
-                    function(err, data ){
-                        expect(err).to.be.ok;
-                        done(); 
-                    }
-                );
-            });
+            if ( testHelpers.mongoTestCommandsEnabled() ) {
+                it('database error', function(done) {
+
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
+                    
+                    Channel.model.find("title returns error", 
+                        function(err, data ){
+                            expect(err).to.be.ok;
+                            done(); 
+                        }
+                    );
+                });
+            } else {
+                it('skipped database error check - enableTestCommands not set for MongoDB instance');
+            }
         });
 
         it( 'should return a Channel when it is in the db' , 
@@ -85,20 +90,24 @@ describe( 'Channel', function() {
 
 
         describe('should propagate errors', function() {
-            it('database error', function(done) {
-                mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
-                    expect(err.message, 
-                        'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
-                        ).to.have.string("connection closed");
-                } );
+            if ( testHelpers.mongoTestCommandsEnabled() ) {
+                it('database error', function(done) {
+                    mongoose.connection.db.admin().command( testHelpers.socketExceptionCommand(1), function(err, commandInfo)  {
+                        expect(err.message, 
+                            'Cannot execute configureFailPoint, set enableTestCommands to 1 in MongoDB'
+                            ).to.have.string("connection closed");
+                    } );
 
-                ( new Channel.model( { title : "title returns error" } ) ).save( 
-                    function(err, data ){
-                        expect(err).to.be.ok;
-                        done(); 
-                    }
-                );
-            });
+                    ( new Channel.model( { title : "title returns error" } ) ).save( 
+                        function(err, data ){
+                            expect(err).to.be.ok;
+                            done(); 
+                        }
+                    );
+                });
+            } else {
+                it('skipped database error check - enableTestCommands not set for MongoDB instance');
+            }
         });
 
         it( 'should save a Channel' , 
