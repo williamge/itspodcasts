@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
 
 var testHelpers = require('./testHelpers');
 
-var main = require('../scraper/src/processing');
+var processing = require('../scraper/src/processing');
 
 var Channel = require('../models/Channel');
 
@@ -36,7 +36,7 @@ describe( 'processing', function() {
     describe( '#readXMLFile', function() {
         it( 'should scrape an XML file read from disk', 
             function(done) {
-                main.readXMLFile(
+                processing.readXMLFile(
                     (require('path')).resolve("test/test.xml"),
                     function verifyXMLData (err, XML) {
                         xml2js.parseString( XML, function( err, result ) {
@@ -50,7 +50,7 @@ describe( 'processing', function() {
         );
         it( 'should allow the callback to handle errors', 
             function(done) {
-                main.readXMLFile(
+                processing.readXMLFile(
                     (require('path')).resolve("testHOPETHISFILEDOESNTEXIST.xml"),
                     function verifyError(err, XML, doneFlag) {
                         expect(err).to.have.property('message')
@@ -66,7 +66,7 @@ describe( 'processing', function() {
     describe( '#requestRSS', function() {
         it( 'should scrape an XML file requested via http', 
             function(done) {
-                main.requestRSS(
+                processing.requestRSS(
                     "http://feeds.feedburner.com/comedydeathrayradio?format=xml",
                     _verifyXMLData(done)
                 );
@@ -74,7 +74,7 @@ describe( 'processing', function() {
         );
         it( 'should allow the callback to handle errors',
             function(done) {
-                main.requestRSS(
+                processing.requestRSS(
                     "http://google.com/googlepleasedontmakethisapage",
                     function verifyError(err, XML, doneFlag) {
                         expect(err).to.have.property('message')
@@ -90,7 +90,7 @@ describe( 'processing', function() {
     describe( '#saveChannel ', function() {
         it( 'should save a channel when given one', 
             function(done) {
-                main.saveChannel(new Channel.model( { title: "test title1" }),
+                processing.saveChannel(new Channel.model( { title: "test title1" }),
                     function() {
                         Channel.model.count( 
                             function(err, channelCount) {
@@ -118,7 +118,7 @@ describe( 'processing', function() {
                         }
                     );
 
-                    main.saveChannel(new Channel.model( { title: "test title1" }),
+                    processing.saveChannel(new Channel.model( { title: "test title1" }),
                         function(err) {
                             expect(err).to.be.ok;
                             done();
