@@ -6,3 +6,23 @@ body {
 a {
   color: #00B7FF;
 }
+
+ul.episodes-list {
+
+}
+
+li.episode-container {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 700px;
+}
+
+.channel {
+    font-style: italic;
+}
+
+.date {
+    font-style: italic;
+    color: #aaa;
+}
+

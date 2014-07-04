@@ -2,7 +2,8 @@
 
 var expect = require('chai').expect;
 
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    _ = require('lodash');
 
 var testHelpers = require('./testHelpers');
 
@@ -144,4 +145,137 @@ describe( 'Channel', function() {
             }
         );
     });
+
+    describe( '#getEpisodes()', function() {
+        describe( 'should retrieve', function() {
+
+
+            beforeEach( function(done) {
+
+                var getEpisodesTestChannel1 = new Channel.model( {
+                    title: "test channel"
+                } );
+
+                var getEpisodesTestChannel2 = new Channel.model( {
+                    title: "test channel2"
+                } );
+
+
+                _.range(1, 35).forEach( function(i) {
+                    getEpisodesTestChannel1.addEpisode( new Episode.model( {
+                        title: i, 
+                        link:'link', 
+                        description:'description',
+                        guid: i,
+                        pubDate: i
+                    } ) );
+                } );
+
+                _.range(35, 71).forEach( function(i) {
+                    getEpisodesTestChannel2.addEpisode( new Episode.model( {
+                        title: i, 
+                        link:'link', 
+                        description:'description',
+                        guid: i,
+                        pubDate: i
+                    } ) );
+                } );
+
+                getEpisodesTestChannel1.save( function(err) {
+                    if (err) done(err);
+                    getEpisodesTestChannel2.save(done);
+                });
+
+            });
+
+            it('with no options set, 50 of all of the episodes in all channels', 
+                function(done) {
+                    Channel.model.getEpisodes( 
+                        {},
+                        function(err, episodes) {
+                            if (err) return done(err);
+
+                            var titles = _.map(episodes, function(episode) {
+                                    return _.parseInt(episode.title) ;
+                                });
+
+                            expect(_.range(1,71)).to.include.members(titles);
+                            done();
+                        }
+                    );
+                }
+            );
+            
+            it('as many of all episodes in all of the channels as the limit option is set to',
+                function(done) {
+                    Channel.model.getEpisodes( 
+                        { limit: 5 },
+                        function(err, episodes) {
+                            if (err) return done(err);
+
+                            var titles = _.map(episodes, function(episode) {
+                                    return _.parseInt(episode.title) ;
+                                });
+
+                            expect(_.range(1,6)).to.include.members(titles);
+                            done();
+                        }
+                    );
+                }
+            );
+
+            it('all episodes in all channels sorted by the field defined in the sort option',
+                function(done) {
+                    Channel.model.getEpisodes( 
+                        { 
+                            sort: {
+                                title: -1
+                            } 
+                        },
+                        function(err, episodes) {
+                            if (err) return done(err);
+
+                            expect(
+                                _.every(episodes, function(value, index, array) {
+                                  // either it is the first element, or otherwise this element should 
+                                  // not be smaller than the previous element.
+                                  return index === 0 || array[index - 1].title >= value.title;
+                                })
+                            ).to.be.ok;
+                            done();
+                        }
+                    );
+                }
+            );
+
+            it('65 of all of the episodes in all of the channels, sorted descending by pubDate, if the proper options are set', 
+                function(done) {
+                    Channel.model.getEpisodes( 
+                        { 
+                            limit: 65,
+                            sort: {
+                                pubDate: -1
+                            } 
+                        },
+                        function(err, episodes) {
+                            if (err) return done(err);
+
+                            var titles = _.map(episodes, function(episode) {
+                                    return _.parseInt(episode.title) ;
+                                });
+
+                            //There are 70 episodes in our test, with dates starting lowest with episode 1 and
+                            //reaching the maximum date in episode 70.
+                            //Since the sorting is going descending and we're limited to 65 episodes, our result
+                            //should be:
+                            //  [70, 69, 68, ..., 8, 7, 6]
+                            //which is returned by _.range(70, 6-1, -1)
+                            expect(_.range(70,5, -1)).to.eql(titles);
+                            done();
+                        }
+                    );
+                }
+            );
+        } );
+    } );
 });

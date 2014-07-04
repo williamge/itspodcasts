@@ -1,7 +1,9 @@
 /** @module Channel */
 
 var mongoose = require('mongoose'),
-    Episode = require('./Episode');
+    _ = require('lodash');
+
+var Episode = require('./Episode');
 
 var ChannelSchema = mongoose.Schema( {
     title: String,
@@ -31,6 +33,43 @@ ChannelSchema.methods.addEpisode = function(episode) {
     } else {
         this._addedEpisodes.push(episode);
     }
+};
+
+ChannelSchema.statics.getEpisodes = function(callingOptions, callback) {
+
+    if ('function' === typeof options) {
+        callback = callingOptions;
+        callingOptions = null;
+    }
+
+    var defaultOptions = {
+        limit: 50
+    };
+
+    var options = _.extend(defaultOptions, callingOptions);
+
+    var aggregate = this.aggregate().unwind("episodes")
+        .project(
+            {
+                channelTitle: "$title",
+                title: "$episodes.title",
+                pubDate: "$episodes.pubDate",
+                link: "$episodes.link",
+                description: "$episodes.description"
+            }
+        );
+
+    if (options.sort) {
+        aggregate = aggregate.sort(
+            options.sort
+        );
+    }
+
+    if ( typeof options.limit !== 'undefined' ) {
+        aggregate = aggregate.limit( options.limit );
+    }
+
+    aggregate.exec(callback);
 };
 
 var Channel = mongoose.model('Channel', ChannelSchema);
