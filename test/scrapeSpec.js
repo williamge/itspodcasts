@@ -3,7 +3,8 @@
 var expect = require('chai').expect;
 
 var xml2js = require('xml2js'),
-    parseString = xml2js.parseString;
+    parseString = xml2js.parseString,
+    fs = require('fs');
 
 var mongoose = require('mongoose');
 
@@ -12,14 +13,6 @@ var Channel = require('../models/Channel'),
 
 var scrapePackage = require('../scraper/src/scrape');
 var scrape = scrapePackage(Channel, Episode);
-
-var Q = require('q');
-
-var test_xml_channel = Q.nfcall( 
-    require('fs').readFile,
-    __dirname + '/data/test_channel.xml'
-);
-
 
 beforeEach(function(done) {
     mongoose.connection.db.dropDatabase(done);
@@ -35,9 +28,7 @@ describe('scrape', function() {
 
     before( function( done ) {
 
-        test_xml_channel.then( function( xmlFS ) {
-          
-
+        fs.readFile(__dirname + '/data/simpleXMLFeed.xml', function(err, xmlFS) {
             xml2js.parseString( xmlFS, function( err, xmlDom ) {
 
                 if (err) {
@@ -56,11 +47,7 @@ describe('scrape', function() {
                     }
                 }
             });
-        } )
-        .catch( function( err ) {
-            console.error("Error loading test data from file.");
-            console.error(err);
-        } );
+        });
     } );
 
     describe( '#scrapeEpisode()', function() {
@@ -73,7 +60,7 @@ describe('scrape', function() {
     describe( '#scrapeChannel()', function() {
         it( 'should return a Channel object', function(done) {
             scrape.scrapeChannel( xml_channel, function(err, channel) {
-                expect(channel).to.have.property("title").equal("test title");
+                expect(channel).to.have.property("title").equal("test channel title");
                 done();
             } );
         });
@@ -82,7 +69,7 @@ describe('scrape', function() {
             (new Channel.model( {title: "not the same title as below, different channel"} )).save(
                 function(err, data) {
                     scrape.scrapeChannel( xml_channel, function(err, channel) {
-                        expect(channel).to.have.property("title").equal("test title");
+                        expect(channel).to.have.property("title").equal("test channel title");
                         done();
                     } );
                 }

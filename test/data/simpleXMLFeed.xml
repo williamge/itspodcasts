@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss>
+    <channel>
+        <title>test channel title</title>
+        <link><![CDATA[http://www.earwolf.com/show/comedy-bang-bang/]]></link>
+        <description><![CDATA[Join host Scott Aukerman (&quot;Comedy Bang! Bang!&quot; on IFC, &quot;Mr. Show&quot;) for a weekly podcast that blends conversation and character work from today's funniest comedians. While Scott begins by traditionally interviewing the celebrities, the open-door policy means an assortment of eccentric oddballs can pop by at any moment to chat, compete in games, and engage in comic revelry. With all that,andregular bonus episodes, we bet your favorite part will still be the plugs!]]></description>
+        <pubDate>Tue, 20 May 2014 02:07:14 -0700</pubDate>
+        <item>
+            <title>test episode title 1</title>
+            <link><![CDATA[http://www.earwolf.com/episode/stinky-chips/]]></link>
+            <description><![CDATA[Portland comedian Shane Torres bursts his way into the first timers club on todays Comedy Bang! Bang! Shane talks about his start in comedy in the land of Portland, his life after his previous appearance on the LIVE from Portland CBB ep, and possibly...]]></description>
+            <guid isPermaLink="false"><![CDATA[http://www.earwolf.com/episode/stinky-chips/]]></guid>
+            <pubDate>Mon, 19 May 2014 00:04:39 -0700</pubDate>
+        </item>
+        <item>
+            <title>test episode title 2</title>
+            <link><![CDATA[http://www.earwolf.com/episode/stinky-chips/]]></link>
+            <description><![CDATA[Portland comedian Shane Torres bursts his way into the first timers club on todays Comedy Bang! Bang! Shane talks about his start in comedy in the land of Portland, his life after his previous appearance on the LIVE from Portland CBB ep, and possibly...]]></description>
+            <guid isPermaLink="false"><![CDATA[http://www.earwolf.com/episode/stinky-chips/]]></guid>
+            <pubDate>Mon, 18 May 2014 00:04:39 -0700</pubDate>
+        </item>
+    </channel>
+</rss>
