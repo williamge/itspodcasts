@@ -77,9 +77,7 @@ describe('scrape', function() {
                 done();
             } );
         });
-    });
-
-    describe( '#scrapeChannel()', function() {
+        
         it( 'should return the correct Channel if there are more than one in the database', function(done) {
             (new Channel.model( {title: "not the same title as below, different channel"} )).save(
                 function(err, data) {
