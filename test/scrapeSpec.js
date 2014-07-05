@@ -4,9 +4,10 @@ var expect = require('chai').expect;
 
 var xml2js = require('xml2js'),
     parseString = xml2js.parseString,
-    fs = require('fs');
+    fs = require('fs'),
+    mongoose = require('mongoose');
 
-var mongoose = require('mongoose');
+var testHelpers = require('./testHelpers');
 
 var Channel = require('../models/Channel'),
     Episode = require('../models/Episode');
@@ -24,11 +25,22 @@ after(function(done) {
 
 describe('scrape', function() {
 
-    var xml, xml_channel, xml_episode;
+    var xmlAsString, xml, xml_channel, xml_episode;
 
     before( function( done ) {
+        testHelpers.loadXML( 
+            __dirname + '/data/simpleXMLFeed.xml', 
+            function(err, data) {
+                expect(err).to.not.be.ok;
+                xmlAsString = data.xmlAsString,
+                xml = data.xml;
+                xml_channel = data.xmlChannel;
+                xml_episode = data.xmlEpisode;
+                done();
+            }
+        );
 
-        fs.readFile(__dirname + '/data/simpleXMLFeed.xml', function(err, xmlFS) {
+        /*fs.readFile(__dirname + '/data/simpleXMLFeed.xml', function(err, xmlFS) {
             xml2js.parseString( xmlFS, function( err, xmlDom ) {
 
                 if (err) {
@@ -47,13 +59,13 @@ describe('scrape', function() {
                     }
                 }
             });
-        });
+        });*/
     } );
 
     describe( '#scrapeEpisode()', function() {
         it( 'should return an episode object', function() {
             var episode = scrape.scrapeEpisode( xml_episode );
-            expect(episode).to.have.property("title");
+            expect(episode).to.have.property("title").equal("test episode title 1");
         });
     });
 
@@ -74,7 +86,35 @@ describe('scrape', function() {
                     } );
                 }
             );
+        });
 
+        var updatedXMLAsStrin, updatedXMLChannel;
+
+        before(function(done) {
+            updatedXMLAsString = xml.replace(
+                "test episode description 1", 
+                "test episode description 1 updated"
+            );
+
+            testHelpers.parseXML(updatedXMLAsString, 
+                function(err, data) {
+                    expect(err).to.not.be.ok;
+
+                    updatedXMLChannel = data.xmlChannel;
+                    done();
+                });
+        });
+
+        it( 'should update the Channel and Episodes if the update option is set', function(done) {
+            scrape.scrapeChannel( xml_channel, function(err, channel) {
+                expect(channel).to.have.property("title").equal("test channel title");
+
+                scrape.scrapeChannel(updatedXMLChannel, function(err, channel) {
+                    expect(channel.episodes[0]).to.have.property("description").equal("test episode description 1 updated");
+                });
+
+                done();
+            } );
         });
     });
 
