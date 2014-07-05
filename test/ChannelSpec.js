@@ -170,7 +170,7 @@ describe( 'Channel', function() {
                 } );
 
 
-                _.range(1, 35).forEach( function(i) {
+                _.chain(_.range(1, 35)).shuffle().forEach( function(i) {
                     getEpisodesTestChannel1.addEpisode( new Episode.model( {
                         title: i, 
                         link:'link', 
@@ -180,7 +180,7 @@ describe( 'Channel', function() {
                     } ) );
                 } );
 
-                _.range(35, 71).forEach( function(i) {
+                _.chain(_.range(35, 71)).shuffle().forEach( function(i) {
                     getEpisodesTestChannel2.addEpisode( new Episode.model( {
                         title: i, 
                         link:'link', 
@@ -209,6 +209,7 @@ describe( 'Channel', function() {
                                 });
 
                             expect(_.range(1,71)).to.include.members(titles);
+                            expect(titles).to.be.length(50);
                             done();
                         }
                     );
@@ -226,7 +227,8 @@ describe( 'Channel', function() {
                                     return _.parseInt(episode.title) ;
                                 });
 
-                            expect(_.range(1,6)).to.include.members(titles);
+                            expect(_.range(1,71)).to.include.members(titles);
+                            expect(titles).to.be.length(5);
                             done();
                         }
                     );
