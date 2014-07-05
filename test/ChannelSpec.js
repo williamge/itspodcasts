@@ -133,7 +133,7 @@ describe( 'Channel', function() {
                     description:'description',
                     guid: 'guid'
                 } ) );
-                expect(test_channel.episodes.length).to.be.ok; 
+                expect(test_channel.episodes.length).to.equal(1); 
                 expect(test_channel.episodes[0].title).to.equal('title');
             }
         );
@@ -147,6 +147,50 @@ describe( 'Channel', function() {
                             title: 'title', 
                             link:'link', 
                             description:'description',
+                            guid: 'guid'
+                        } );
+                    }
+                ).to.throw(TypeError);
+            }
+        );
+    });
+
+    describe( '#updateEpisode()', function() {
+
+        var testChannel;
+
+        beforeEach( function() {
+                testChannel = new Channel.model( { title: 'test channel' } );
+                testChannel.addEpisode( new Episode.model( {
+                    title: 'title', 
+                    link:'link', 
+                    description:'description',
+                    guid: 'guid'
+                } ) );
+        });
+
+        it( 'should update an existing episode in the Channel', 
+            function() {
+                testChannel.updateEpisode( new Episode.model( {
+                    title: 'title', 
+                    link:'link', 
+                    description:'updated description',
+                    guid: 'guid'
+                } ) );
+                expect(testChannel.episodes.length).to.equal(1); 
+                expect(testChannel.episodes[0].description).to.equal('updated description');
+            }
+        );
+
+        it( 'should throw an error if a non-episode object is passed', 
+            function() {
+                expect(
+                    function addNonEpisode() {
+                        var testChannel = new Channel.model( { title: 'test channel' } );
+                        testChannel.updateEpisode(  {
+                            title: 'title', 
+                            link:'link', 
+                            description:'updated description',
                             guid: 'guid'
                         } );
                     }
