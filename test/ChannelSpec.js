@@ -3,7 +3,8 @@
 var expect = require('chai').expect;
 
 var mongoose = require('mongoose'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    async = require('async');
 
 var testHelpers = require('./testHelpers');
 
@@ -179,6 +180,48 @@ describe( 'Channel', function() {
                 } ) );
                 expect(testChannel.episodes.length).to.equal(1); 
                 expect(testChannel.episodes[0].description).to.equal('updated description');
+            }
+        );
+
+        it( 'should update an existing episode in the Channel in the database', 
+            function(done) {
+                async.series(
+                    [
+                        function(next) {
+                            testChannel.save(next);
+                        },                       
+                        function(next) {
+                            testChannel.updateEpisode( new Episode.model( {
+                                title: 'title', 
+                                link:'link', 
+                                description:'updated description',
+                                guid: 'guid'
+                            } ) );
+                            next();
+                        },
+                        function(next) {
+                            testChannel.save(next);
+                        },
+                        function(next) {
+                            Channel.model.findOne( {title: 'test channel'}, 
+                                function(err, result) {
+                                    expect(err).to.not.be.ok;
+                                    
+                                    expect(result.episodes.length).to.equal(1); 
+                                    expect(result.episodes[0].description).to.equal('updated description');
+                                    next(err);
+                                }  
+                            );
+                        }
+                    ],
+                    function(err) {
+                        expect(err).to.not.be.ok;
+
+                        expect(testChannel.episodes.length).to.equal(1); 
+                        expect(testChannel.episodes[0].description).to.equal('updated description');
+                        done();
+                    }
+                );
             }
         );
 
