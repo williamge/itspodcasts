@@ -31,7 +31,7 @@ function podcastXMLSource() {
     if (minimistArgv.file) {
         XMLSource.push({
             type: "file",
-            source: minimistArgv.file
+            source: path.resolve(minimistArgv.file)
         });
     }
 
