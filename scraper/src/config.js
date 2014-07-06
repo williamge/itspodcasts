@@ -31,7 +31,7 @@ function podcastXMLSource() {
     if (minimistArgv.file) {
         XMLSource.push({
             type: "file",
-            source: minimistArgv.file
+            source: path.resolve(minimistArgv.file)
         });
     }
 
@@ -47,5 +47,6 @@ function podcastXMLSource() {
 module.exports = {
     mongoURL: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URL || 'mongodb://localhost/podcasts',
     cmd_args: commandLineArguments(),
-    XMLSource: podcastXMLSource()
+    XMLSource: podcastXMLSource(),
+    softUpdate: minimistArgv['soft-update'] || false
 };

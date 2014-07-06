@@ -1,3 +1,8 @@
+var _ = require('lodash'),
+    fs = require('fs'),
+    xml2js = require('xml2js'),
+    parseString = xml2js.parseString;
+
 var socketExceptionCommand = function(timesToFail) {
     return failPointCommand( 
                 'throwSockExcep', 
@@ -21,9 +26,48 @@ var mongoTestCommandsEnabled = function() {
     return process.env.ENABLE_MONGO_TEST_COMMANDS || false;
 };
 
+
+var parseXML = function (xmlString, callback) {
+    xml2js.parseString( xmlString, 
+        function( err, xmlDom ) {
+            if (err) {
+                console.error("Error in parsing XML");
+                return callback(err);
+            } else {
+                try {
+
+                    var output = {};
+
+                    output.xml = xmlString.toString();
+                    output.xmlChannel = xmlDom.rss.channel[0];
+                    output.xmlEpisode = output.xmlChannel.item[0];
+                    return callback(err, output);
+                }
+                catch (e) {
+                    console.error("Error while accesing XML DOM");
+                    return callback(err);
+                }
+            }
+        }
+    );
+};
+
+var loadXML = function(path,  callback) {
+    fs.readFile(path, 
+        function(err, xmlFS) {
+            if (err) return callback(err);
+
+            parseXML(xmlFS.toString(), callback);
+        }
+    );
+};
+
+
 module.exports = {
     socketExceptionCommand: socketExceptionCommand,
     failPointCommand: failPointCommand,
     runCommand: runCommand,
-    mongoTestCommandsEnabled: mongoTestCommandsEnabled
+    mongoTestCommandsEnabled: mongoTestCommandsEnabled,
+    parseXML: parseXML,
+    loadXML: loadXML
 };

@@ -2,12 +2,17 @@
 
 var xml2js = require('xml2js'),
     async = require('async'),
-    parseString = xml2js.parseString;
+    parseString = xml2js.parseString,
+    _ = require('lodash');
 
 var selectiveLog = require('./logging'),
     logLevel = selectiveLog.logLevels;
 
-module.exports = function(Channel, Episode) {
+module.exports = function(Channel, Episode, options) {
+
+    if (!options) {
+        options = {};
+    }
 
     /**
      * Returns an object with the scraped values of an 'episode' from an item XML tag from a podcast RSS feed
@@ -35,7 +40,25 @@ module.exports = function(Channel, Episode) {
      * @param  element XML-DOM object corresponding to a 'channel' element from an RSS feed
      * @param  {scrapedChannelCallback} callback Called after element is turned in to a Channel or with an error
      */
-    function scrapeChannel(channelXML, callback) {
+    function scrapeChannel(channelXML, callingOptions, callback) {
+        if (typeof callingOptions === 'function') {
+            callback = callingOptions;
+            callingOptions = null;
+        }
+
+        var options =
+            _.extend({
+                    /**
+                     * Determines whether the function should update the existing value of channel and episode
+                     * if they are set. 'true' will update existing object, 'false' will skip updating object (but
+                     * will still process sub-documents).
+                     * @type {Boolean}
+                     */
+                    softUpdate: false
+                },
+                callingOptions
+            );
+
         Channel.model.findOne({
             title: channelXML.title[0]
         }, function elementResult(err, channel) {
@@ -49,13 +72,17 @@ module.exports = function(Channel, Episode) {
 
             episodes.forEach(function(episodeXML, index, array) {
                 var episode = new Episode.model(scrapeEpisode(episodeXML));
+
                 if (!channel.episodes.id(episode.getID())) {
                     selectiveLog("adding episode to channel", logLevel.informational);
                     channel.addEpisode(
                         episode
                     );
+                } else if (options.softUpdate) {
+                    selectiveLog("updating existing episode (soft-update enabled)", logLevel.informational);
+                    channel.updateEpisode(episode);
                 } else {
-                    selectiveLog("episode already in db", logLevel.informational);
+                    selectiveLog("episode already in db, not updating (soft-update not enabled)", logLevel.informational);
                 }
             });
 
@@ -69,6 +96,7 @@ module.exports = function(Channel, Episode) {
      * @param  {scrapedSourceCallback} callback Called after a source is scraped and a list of Channel objects is populated
      */
     function scrapeSource(data, callback) {
+
         var channelList = [];
         var channelScrapers = 0;
         xml2js.parseString(data, function(err, result) {
@@ -79,6 +107,7 @@ module.exports = function(Channel, Episode) {
                     result.rss.channel,
                     function eachIterator(channel, done) {
                         scrapeChannel(channel,
+                            options,
                             function withChannel(err, channel) {
                                 if (err) {
                                     return done(err);

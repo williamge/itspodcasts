@@ -26,7 +26,10 @@ EpisodeSchema.pre('save', function(next) {
  * @return {String} Unique ID for the Episode
  */
 EpisodeSchema.methods.getID = function() {
-    return this.guid || this.link;
+    if (!this._id) {
+        this._id = this.guid || this.link;
+    }
+    return this._id;
 };
 
 var Episode = mongoose.model('Episode', EpisodeSchema);
