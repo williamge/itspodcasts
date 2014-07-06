@@ -10,7 +10,7 @@ var mongoose = require('mongoose'),
 
 var testHelpers = require('./testHelpers');
 
-var processing = require('../scraper/src/processing');
+var processing = require('../scraper/src/processing')();
 
 var Channel = require('../models/Channel'),
     request = require('request');

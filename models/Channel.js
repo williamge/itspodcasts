@@ -27,12 +27,35 @@ ChannelSchema.methods.addEpisode = function(episode) {
     if (!(episode instanceof Episode.model)) {
         throw new TypeError("Passed episode not of type Episode");
     }
+
+    //getID also sets the _id for the episode, which is needed to be able
+    //to search episodes by id if you don't save before searching.
+    //TODO: do something about this call to make it not look so odd
+    episode.getID();
     this.episodes.push(episode);
-    if (!this._addedEpisodes) {
-        this._addedEpisodes = [episode];
-    } else {
-        this._addedEpisodes.push(episode);
+
+    this._addedEpisodes = this._addedEpisodes || [];
+    this._addedEpisodes.push(episode);
+};
+
+ChannelSchema.methods.updateEpisode = function(episode) {
+    if (!(episode instanceof Episode.model)) {
+        throw new TypeError("Passed episode not of type Episode");
     }
+
+    if ( !this.episodes.id( episode.getID() ) ) {
+        throw new Error("Passed episode not already in channel");
+    }
+
+    var existingEpisode = this.episodes.id( episode.getID() );
+
+    //'_doc' is the actual document that is stored in the DB, without specifying 
+    //that property the code would just crash as we would be overwriting the internal mongoose 
+    //properties/methods in weird ways.
+    _.extend(existingEpisode, episode._doc);
+
+    this._updatedEpisodes = this._updatedEpisodes || [];
+    this._updatedEpisodes.push(episode);
 };
 
 ChannelSchema.statics.getEpisodes = function(callingOptions, callback) {

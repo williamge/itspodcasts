@@ -22,7 +22,6 @@
   "devDependencies": {
     "chai": "*",
     "mocha": "~1.19.0",
-    "q": "~1.0.1",
     "grunt-jsbeautifier": "~0.2.7",
     "grunt": "~0.4.5",
     "grunt-githooks": "~0.3.1",
