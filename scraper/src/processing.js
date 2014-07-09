@@ -25,7 +25,7 @@ module.exports = function(options) {
      * @param  {doneCallback} done    Callback to be called when the Channel is saved or on an error
      */
     function saveChannel(channel, done) {
-        channel.save(function(err, data) {
+        channel.saveChannelAndEpisodes(function(err) {
             if (err) {
                 return done(err);
             }

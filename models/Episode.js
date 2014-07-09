@@ -8,7 +8,13 @@ var EpisodeSchema = mongoose.Schema( {
     link: String,
     description: String,
     pubDate: Date,
-    guid: String
+    guid: String,
+    channel : { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Channel',
+        required: true
+    },
+    channelTitle: String
 });
 
 /**

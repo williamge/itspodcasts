@@ -10,10 +10,18 @@ var selectiveLog = require('./logging'),
 
 module.exports = function(Channel, Episode, options) {
 
-    if (!options) {
-        options = {};
-    }
-
+    options =
+        _.extend({
+                /**
+                 * Determines whether the function should update the existing value of channel and episode
+                 * if they are set. 'true' will update existing object, 'false' will skip updating object (but
+                 * will still process sub-documents).
+                 * @type {Boolean}
+                 */
+                softUpdate: false
+            },
+            options
+    );
     /**
      * Returns an object with the scraped values of an 'episode' from an item XML tag from a podcast RSS feed
      * @param  element An XML-DOM object corresponding to an 'item' element from an RSS feed
@@ -40,24 +48,7 @@ module.exports = function(Channel, Episode, options) {
      * @param  element XML-DOM object corresponding to a 'channel' element from an RSS feed
      * @param  {scrapedChannelCallback} callback Called after element is turned in to a Channel or with an error
      */
-    function scrapeChannel(channelXML, callingOptions, callback) {
-        if (typeof callingOptions === 'function') {
-            callback = callingOptions;
-            callingOptions = null;
-        }
-
-        var options =
-            _.extend({
-                    /**
-                     * Determines whether the function should update the existing value of channel and episode
-                     * if they are set. 'true' will update existing object, 'false' will skip updating object (but
-                     * will still process sub-documents).
-                     * @type {Boolean}
-                     */
-                    softUpdate: false
-                },
-                callingOptions
-            );
+    function scrapeChannel(channelXML, callback) {
 
         Channel.model.findOne({
             title: channelXML.title[0]
@@ -72,8 +63,7 @@ module.exports = function(Channel, Episode, options) {
 
             episodes.forEach(function(episodeXML, index, array) {
                 var episode = new Episode.model(scrapeEpisode(episodeXML));
-
-                if (!channel.episodes.id(episode.getID())) {
+                if (!channel.containsEpisode(episode.getID())) {
                     selectiveLog("adding episode to channel", logLevel.informational);
                     channel.addEpisode(
                         episode
@@ -107,7 +97,6 @@ module.exports = function(Channel, Episode, options) {
                     result.rss.channel,
                     function eachIterator(channel, done) {
                         scrapeChannel(channel,
-                            options,
                             function withChannel(err, channel) {
                                 if (err) {
                                     return done(err);

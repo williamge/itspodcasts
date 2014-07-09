@@ -6,7 +6,8 @@ var mongoose = require('mongoose');
 
 var testHelpers = require('./testHelpers');
 
-var Episode = require('../models/Episode');
+var Episode = require('../models/Episode'),
+    Channel = require('../models/Channel');
 
 
 beforeEach(function(done) {
@@ -18,6 +19,14 @@ after(function(done) {
 });
 
 describe( 'Episode', function() {
+
+    var testChannel;
+
+    before(function(done) {
+        testChannel = new Channel.model( { title : "test channel title" } );
+        testChannel.save(done);
+    });
+
     describe( '#new', function() {
         it( 'should set up an Episode object' , 
             function() {
@@ -25,10 +34,10 @@ describe( 'Episode', function() {
                     title : 'test title', 
                     link : 'link',
                     description : 'description',
-                    guid : 'guid'
+                    guid : 'guid',
+                    channel: testChannel._id
                 });
-                expect(episode).to.have.property('title')
-                    .equal('test title');
+                expect(episode).to.have.property('title').equal('test title');
             }
         );
     } );
@@ -41,14 +50,15 @@ describe( 'Episode', function() {
                     title : 'test title', 
                     link : 'link',
                     description : 'description',
-                    guid : 'guid'
+                    guid : 'guid',
+                    channel: testChannel._id
                 } );
 
                 episode.save( function(err) {
-                    expect(err).to.not.be.ok;
+                    if (err) throw err;
                     Episode.model.findOne(episode.getID(),  
                         function( err, data ){
-                            expect(err).to.not.be.ok;
+                            if (err) throw err;
 
                             expect(data).to.be.an.instanceOf(Episode.model);
                             done();
@@ -91,9 +101,9 @@ describe( 'Episode', function() {
                     } );
 
                     ( new Episode.model({
-                        channel: "channel",
                         title: "title returns error",
-                        guid: "guid"
+                        guid: "guid",
+                        channel: testChannel._id
                     }))
                     .save( 
                         function(err, data ){
@@ -113,12 +123,13 @@ describe( 'Episode', function() {
                     title : 'test title', 
                     link : 'link',
                     description : 'description',
-                    guid : 'guid'
+                    guid : 'guid',
+                    channel: testChannel._id
                 } );
 
                 episode.save( function(err) {
                     Episode.model.findOne( {_id: episode.getID()} , function(err, result) {
-                        expect(result).to.be.ok;
+                        expect(result).to.have.property('title').equal('test title');
                         done();
                     } );
                 } );

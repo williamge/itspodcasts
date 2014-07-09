@@ -1,13 +1,15 @@
 /** @module Channel */
 
 var mongoose = require('mongoose'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    async = require('async'),
+    assert = require('assert');
 
 var Episode = require('./Episode');
 
 var ChannelSchema = mongoose.Schema( {
-    title: String,
-    episodes: [ Episode.schema ]
+    title: { type: String, required: true },
+    episodes: [ { type: String, ref: 'Episode' } ]
 });
 
 /**
@@ -16,6 +18,14 @@ var ChannelSchema = mongoose.Schema( {
  */
 ChannelSchema.methods.getID = function() {
     return this.title;
+};
+
+ChannelSchema.methods.getUpdatedEpisodes = function() {
+    return this._updatedEpisodes || [];
+};
+
+ChannelSchema.methods.getAddedEpisodes = function() {
+    return this._addedEpisodes || [];
 };
 
 /**
@@ -43,24 +53,81 @@ ChannelSchema.methods.updateEpisode = function(episode) {
         throw new TypeError("Passed episode not of type Episode");
     }
 
-    if ( !this.episodes.id( episode.getID() ) ) {
+    if ( ! this.containsEpisode( episode.getID() ) ) {
         throw new Error("Passed episode not already in channel");
     }
-
-    var existingEpisode = this.episodes.id( episode.getID() );
-
-    //'_doc' is the actual document that is stored in the DB, without specifying 
-    //that property the code would just crash as we would be overwriting the internal mongoose 
-    //properties/methods in weird ways.
-    _.extend(existingEpisode, episode._doc);
 
     this._updatedEpisodes = this._updatedEpisodes || [];
     this._updatedEpisodes.push(episode);
 };
 
+ChannelSchema.methods.containsEpisode = function(id) {
+    return this.episodes.indexOf( id ) > -1;
+};
+
+ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
+    
+    //This would be a nice place to use a bulk insert operation, mongoose doesn't have that though
+
+    function channelDetails(channel) {
+        return {
+            channel: channel._id,
+            channelTitle: channel.title
+        };
+    }
+
+    var channel = this;
+
+    this.save(function(err, savedChannel) {
+
+        if (err) return callback(err);
+
+        async.parallel(
+            [
+                function saveAddedEpisodes(done) {
+                    async.each(
+                        channel._addedEpisodes || [],
+                        function saveEpisode(episode, next) {
+                            _.extend( episode, channelDetails(savedChannel) );
+
+                            episode.save(next);
+                        },
+                        function doneSaving(err) {
+                            done(err);
+                        }
+                    );
+                },
+                function saveUpdatedEpisodes(done) {
+                    async.each(
+                        channel._updatedEpisodes || [],
+                        function updateEpisode(episode, next) {
+                            Episode.model.findOne( {_id : episode.getID() } )
+                                .exec(
+                                    function(err, episodeFromDB) {
+                                        if (err) return next(err);
+                                        assert( !channel.isNew );
+
+                                        var updatedEpisode = _.extend(episodeFromDB, episode._doc );
+                                        updatedEpisode.save(next);
+                                    }
+                                );
+                        },
+                        function doneUpdating(err) {
+                            done(err);
+                        }
+                    );
+                }
+            ],
+            function done(err) {
+                callback(err);
+            }
+        );
+    });
+};
+
 ChannelSchema.statics.getEpisodes = function(callingOptions, callback) {
 
-    if ('function' === typeof options) {
+    if ('function' === typeof callingOptions) {
         callback = callingOptions;
         callingOptions = null;
     }
@@ -71,16 +138,7 @@ ChannelSchema.statics.getEpisodes = function(callingOptions, callback) {
 
     var options = _.extend(defaultOptions, callingOptions);
 
-    var aggregate = this.aggregate().unwind("episodes")
-        .project(
-            {
-                channelTitle: "$title",
-                title: "$episodes.title",
-                pubDate: "$episodes.pubDate",
-                link: "$episodes.link",
-                description: "$episodes.description"
-            }
-        );
+    var aggregate = Episode.model.find();
 
     if (options.sort) {
         aggregate = aggregate.sort(

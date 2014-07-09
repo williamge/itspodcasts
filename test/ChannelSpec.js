@@ -78,8 +78,8 @@ describe( 'Channel', function() {
         it( 'should return nothing when it is not in the db' , 
             function(done) {
                 Channel.model.findOne( {title : "not in a collection, nope" }, function(err, data) {
+                    if (err) throw err;
                     expect(data).to.not.be.ok; 
-                    expect(err).to.not.be.ok;
                     done(); 
                 } );
                               
@@ -117,6 +117,7 @@ describe( 'Channel', function() {
                 test_channel.save( function(err) {
                     Channel.model.findOne( {title: test_channel.getID()} , function(err, result) {
                         expect(result).to.be.ok;
+                        expect(result).to.have.property('title').equal('test channel');
                         done();
                     } );
                 } ); 
@@ -127,15 +128,16 @@ describe( 'Channel', function() {
 
         it( 'should add an episode to the Channel', 
             function() {
-                var test_channel = new Channel.model( { title: 'test channel' } );
-                test_channel.addEpisode( new Episode.model( {
+                var testChannel = new Channel.model( { title: 'test channel' } );
+                var testEpisode =  new Episode.model( {
                     title: 'title', 
                     link:'link', 
                     description:'description',
                     guid: 'guid'
-                } ) );
-                expect(test_channel.episodes.length).to.equal(1); 
-                expect(test_channel.episodes[0].title).to.equal('title');
+                } ) ;
+                testChannel.addEpisode(testEpisode);
+                expect(testChannel).to.have.property('episodes').length(1); 
+                expect(testChannel.episodes.indexOf( testEpisode.getID() )).to.equal(0);
             }
         );
 
@@ -178,8 +180,10 @@ describe( 'Channel', function() {
                     description:'updated description',
                     guid: 'guid'
                 } ) );
-                expect(testChannel.episodes.length).to.equal(1); 
-                expect(testChannel.episodes[0].description).to.equal('updated description');
+
+                var updatedEpisodes = testChannel.getUpdatedEpisodes();
+                expect(updatedEpisodes).to.have.length(1);
+                expect(updatedEpisodes[0]).to.have.property('description').equal('updated description');
             }
         );
 
@@ -188,7 +192,7 @@ describe( 'Channel', function() {
                 async.series(
                     [
                         function(next) {
-                            testChannel.save(next);
+                            testChannel.saveChannelAndEpisodes(next);
                         },                       
                         function(next) {
                             testChannel.updateEpisode( new Episode.model( {
@@ -200,25 +204,22 @@ describe( 'Channel', function() {
                             next();
                         },
                         function(next) {
-                            testChannel.save(next);
+                            testChannel.saveChannelAndEpisodes(next);
                         },
                         function(next) {
-                            Channel.model.findOne( {title: 'test channel'}, 
+                            Episode.model.findOne( {title: 'title'}, 
                                 function(err, result) {
-                                    expect(err).to.not.be.ok;
+                                    if (err) throw err;
+                                    expect(result).to.be.ok;
                                     
-                                    expect(result.episodes.length).to.equal(1); 
-                                    expect(result.episodes[0].description).to.equal('updated description');
+                                    expect(result).to.have.property('description').equal('updated description');
                                     next(err);
                                 }  
                             );
                         }
                     ],
                     function(err) {
-                        expect(err).to.not.be.ok;
-
-                        expect(testChannel.episodes.length).to.equal(1); 
-                        expect(testChannel.episodes[0].description).to.equal('updated description');
+                        if (err) throw err;
                         done();
                     }
                 );
@@ -277,9 +278,9 @@ describe( 'Channel', function() {
                     } ) );
                 } );
 
-                getEpisodesTestChannel1.save( function(err) {
+                getEpisodesTestChannel1.saveChannelAndEpisodes( function(err) {
                     if (err) done(err);
-                    getEpisodesTestChannel2.save(done);
+                    getEpisodesTestChannel2.saveChannelAndEpisodes(done);
                 });
 
             });

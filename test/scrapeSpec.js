@@ -39,27 +39,6 @@ describe('scrape', function() {
                 done();
             }
         );
-
-        /*fs.readFile(__dirname + '/data/simpleXMLFeed.xml', function(err, xmlFS) {
-            xml2js.parseString( xmlFS, function( err, xmlDom ) {
-
-                if (err) {
-                    console.error("Error in parsing XML");
-                    console.error( err );
-                } else {
-                    try {
-                        xml = xmlFS;
-                        xml_channel = xmlDom.rss.channel[0];
-                        xml_episode = xml_channel.item[0];
-                        done();
-                    }
-                    catch (e) {
-                        console.error("Error while accesing XML DOM");
-                        console.error( e );
-                    }
-                }
-            });
-        });*/
     } );
 
     describe( '#scrapeEpisode()', function() {
@@ -98,7 +77,7 @@ describe('scrape', function() {
 
             testHelpers.parseXML(updatedXMLAsString, 
                 function(err, data) {
-                    expect(err).to.not.be.ok;
+                    if (err) throw err;
 
                     updatedXMLChannel = data.xmlChannel;
                     done();
@@ -108,12 +87,14 @@ describe('scrape', function() {
         it( 'should update the Channel and Episodes if the update option is set', function(done) {
             scrape.scrapeChannel( xml_channel, function(err, channel) {
                 expect(channel).to.have.property("title").equal("test channel title");
+                channel.save(function(err) {
+                    if (err) throw err;
 
-                scrape.scrapeChannel(updatedXMLChannel, function(err, channel) {
-                    expect(channel.episodes[0]).to.have.property("description").equal("test episode description 1 updated");
+                    scrapePackage(Channel, Episode, {softUpdate: true}).scrapeChannel(updatedXMLChannel, function(err, channel) {
+                        expect(channel.getUpdatedEpisodes()[0]).to.have.property("description").equal("test episode description 1 updated");
+                        done();
+                    });
                 });
-
-                done();
             } );
         });
     });
