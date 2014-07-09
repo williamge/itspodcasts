@@ -3,14 +3,7 @@
 var fs = require('fs'),
     path = require('path'),
     async = require('async'),
-    request = require('request'),
-    xml2js = require('xml2js'),
-    parseString = xml2js.parseString,
-    mongoose = require('mongoose');
-
-var configFromFile = require('./config'),
-    selectiveLog = require('./logging'),
-    logLevel = selectiveLog.logLevels;
+    request = require('request');
 
 var Channel = require('../../models/Channel'),
     Episode = require('../../models/Episode');
@@ -90,7 +83,9 @@ module.exports = function(options) {
      * @param  {Function} err Error on scraping if there were any
      */
     function scrapingComplete(err) {
-        if (err) throw err;
+        if (err) {
+            throw err;
+        }
         process.exit();
     }
 

@@ -2,7 +2,6 @@
 
 var xml2js = require('xml2js'),
     async = require('async'),
-    parseString = xml2js.parseString,
     _ = require('lodash');
 
 var selectiveLog = require('./logging'),
@@ -34,7 +33,9 @@ module.exports = function(Channel, Episode, options) {
             description: (element.description[0]._ || element.description[0])
         };
 
-        if (element.pubDate) episode.pubDate = element.pubDate;
+        if (element.pubDate) {
+            episode.pubDate = element.pubDate;
+        }
 
         if (element.guid) {
             episode.guid = element.guid[0]._ || element.guid[0];
@@ -61,7 +62,7 @@ module.exports = function(Channel, Episode, options) {
 
             var episodes = channelXML.item;
 
-            episodes.forEach(function(episodeXML, index, array) {
+            episodes.forEach(function(episodeXML) {
                 var episode = new Episode.model(scrapeEpisode(episodeXML));
                 if (!channel.containsEpisode(episode.getID())) {
                     selectiveLog("adding episode to channel", logLevel.informational);
@@ -88,7 +89,6 @@ module.exports = function(Channel, Episode, options) {
     function scrapeSource(data, callback) {
 
         var channelList = [];
-        var channelScrapers = 0;
         xml2js.parseString(data, function(err, result) {
             if (err) {
                 return callback(err);

@@ -80,7 +80,9 @@ ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
 
     this.save(function(err, savedChannel) {
 
-        if (err) return callback(err);
+        if (err) {
+            return callback(err);
+        }
 
         async.parallel(
             [
@@ -104,7 +106,9 @@ ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
                             Episode.model.findOne( {_id : episode.getID() } )
                                 .exec(
                                     function(err, episodeFromDB) {
-                                        if (err) return next(err);
+                                        if (err) {
+                                            return next(err);
+                                        }
                                         assert( !channel.isNew );
 
                                         var updatedEpisode = _.extend(episodeFromDB, episode._doc );

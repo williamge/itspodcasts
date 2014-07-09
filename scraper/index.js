@@ -1,15 +1,8 @@
 /** @module Channel */
 
-var fs = require('fs'),
-    async = require('async'),
-    request = require('request'),
-    xml2js = require('xml2js'),
-    parseString = xml2js.parseString,
-    mongoose = require('mongoose');
+var mongoose = require('mongoose');
 
-var configFromFile = require('./src/config'),
-    selectiveLog = require('./src/logging'),
-    logLevel = selectiveLog.logLevels;
+var configFromFile = require('./src/config');
 
 if (require.main === module) {
     scraper(configFromFile).main();
