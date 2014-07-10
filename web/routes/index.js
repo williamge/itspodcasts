@@ -30,6 +30,7 @@ exports.index = function(req, res) {
 exports.allChannels = function(req, res) {
 
     Channel.model.find()
+        .populate('episodes')
         .exec(
             function(err, channel) {
                 res.render('all', {
