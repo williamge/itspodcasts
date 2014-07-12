@@ -22,7 +22,7 @@ function commandLineArguments() {
 function podcastXMLSource() {
     var XMLSource = [];
 
-    function interpret(argument) {
+    function interpretSaveOption(argument) {
         if (!argument) {
             return !argument;
         }
@@ -33,7 +33,7 @@ function podcastXMLSource() {
     if (minimistArgv.rss) {
         var rssArgSplit = minimistArgv.rss.split(",");
         var rssURL = rssArgSplit[0];
-        var saveRssSourceToDB = interpret(rssArgSplit[1]) || false;
+        var saveRssSourceToDB = interpretSaveOption(rssArgSplit[1]) || false;
         XMLSource.push({
             type: "rss",
             source: rssURL,
@@ -44,7 +44,7 @@ function podcastXMLSource() {
     if (minimistArgv.file) {
         var fileArgSplit = minimistArgv.file.split(",");
         var fileURL = fileArgSplit[0];
-        var saveFileSourceToDB = interpret(fileArgSplit[1]) || false;
+        var saveFileSourceToDB = interpretSaveOption(fileArgSplit[1]) || false;
 
         XMLSource.push({
             type: "file",
@@ -56,7 +56,7 @@ function podcastXMLSource() {
     if (minimistArgv.sources) {
         var sourcesFileArgSplit = minimistArgv.sources.split(",");
         var sourcesFilePath = sourcesFileArgSplit[0];
-        var saveSourcesFileSourceToDB = interpret(sourcesFileArgSplit[1]) || false;
+        var saveSourcesFileSourceToDB = interpretSaveOption(sourcesFileArgSplit[1]) || false;
 
         var sourcesFileSources = require(
             path.resolve(sourcesFilePath)
