@@ -14,9 +14,14 @@ if (require.main === module) {
 
 function scraper(config) {
 
-    var processing = require('./src/processing.js')(createOptions());
+    var processing = require('./src/processing.js')(createOptions(config));
 
-    function createOptions() {
+    /**
+     * Creates an object with options for the processing module.
+     * @param  {Object} config source of options to construct new options from
+     * @return {Object}        object with options ready for consumption by the processing module
+     */
+    function createOptions(config) {
         var returnOptions = {
             softUpdate: config.softUpdate
         };
