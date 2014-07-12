@@ -66,7 +66,13 @@ function scraper(config) {
                 function(sourceEntry) {
                     var sourceModel = new PodcastSource.model(sourceEntry);
                     if (sourceEntry.saveToDB) {
-                        sourceModel.save();
+                        sourceModel.save(
+                            function(err) {
+                                //intentionally not using a callback from here, 
+                                //we only care enough about the write to log an error
+                                winston.error(err);
+                            }
+                        );
                         winston.info('Saving source to database: ' + sourceEntry.source);
                     }
                     return sourceModel;
