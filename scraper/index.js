@@ -67,6 +67,7 @@ function scraper(config) {
                     var sourceModel = new PodcastSource.model(sourceEntry);
                     if (sourceEntry.saveToDB) {
                         sourceModel.save();
+                        winston.info('Saving source to database: ' + sourceEntry.source);
                     }
                     return sourceModel;
                 }

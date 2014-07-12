@@ -143,7 +143,10 @@ module.exports = function(options) {
              * @param  {doneCallback} done   Callback that is called when scraping is complete, or on an error.
              */
             function mainIterator(source, done) {
-                console.log(source);
+                winston.info("Working on source: ", {
+                    source: source.source,
+                    type: source.type
+                });
                 switch (source.type) {
                     case "file":
                         readXMLFile(source.source, scrapeController, done);
