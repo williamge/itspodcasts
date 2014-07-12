@@ -3,12 +3,14 @@
 var fs = require('fs'),
     path = require('path'),
     async = require('async'),
-    request = require('request');
+    request = require('request'),
+    winston = require('winston');
 
 var Channel = require('../../models/Channel'),
     Episode = require('../../models/Episode');
 
 module.exports = function(options) {
+    options = options || {};
     var scrape = require('./scrape')(Channel, Episode, options);
 
     /**
@@ -22,6 +24,14 @@ module.exports = function(options) {
             if (err) {
                 return done(err);
             }
+            winston.info('Saved channel: ' + channel.title);
+            winston.info('   Saved added episodes: ' + channel.getAddedEpisodes().length);
+            if (options.softUpdate) {
+                winston.info('   Saved updated episodes: ' + channel.getUpdatedEpisodes().length);
+            } else {
+                winston.info('   No updated episodes (reason: soft-update not enabled)');
+            }
+
             return done();
         });
     }
@@ -117,7 +127,7 @@ module.exports = function(options) {
      */
     function scrapeController(err, data, callback) {
         if (err) {
-            console.error(err);
+            winston.error(err);
             callback(err);
         } else {
             scrapeXML(data, saveChannel, callback);

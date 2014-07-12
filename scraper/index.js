@@ -1,7 +1,8 @@
 /** @module Channel */
 
 var mongoose = require('mongoose'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    winston = require('winston');
 
 var PodcastSource = require('../models/PodcastSource');
 
@@ -16,9 +17,11 @@ function scraper(config) {
     var processing = require('./src/processing.js')(createOptions());
 
     function createOptions() {
-        return {
+        var returnOptions = {
             softUpdate: config.softUpdate
         };
+        winston.log('debug', 'Config in scraper/index.js', returnOptions);
+        return returnOptions;
     }
 
     /**
@@ -39,13 +42,13 @@ function scraper(config) {
         mongoose.connect(mongoURL);
 
         mongoose.connection.on('error', function(err) {
-            console.error('Could not connect to mongo server!');
-            console.error(err);
+            winston.error('Could not connect to mongo server!', err);
             throw err;
         });
     }
 
     function tearDown() {
+        winston.info('Exiting gracefully');
         process.exit();
     }
 
@@ -73,12 +76,12 @@ function scraper(config) {
 
         function startRunning(err, sourcesList) {
             if (err) {
-                console.error(err);
+                winston.error(err);
                 throw err;
             }
 
             if (!sourcesList.length) {
-                console.warn("No sources defined, exiting program.");
+                winston.warn("No sources defined, exiting program.");
                 return tearDown();
             }
 

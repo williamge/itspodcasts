@@ -2,7 +2,8 @@
 
 var xml2js = require('xml2js'),
     async = require('async'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    winston = require('winston');
 
 var selectiveLog = require('./logging'),
     logLevel = selectiveLog.logLevels;
@@ -58,6 +59,7 @@ module.exports = function(Channel, Episode, options) {
                 channel = new Channel.model({
                     title: channelXML.title[0]
                 });
+                winston.info('Channel: [' + channel.title + '] was not found in the database');
             }
 
             var episodes = channelXML.item;
@@ -65,15 +67,15 @@ module.exports = function(Channel, Episode, options) {
             episodes.forEach(function(episodeXML) {
                 var episode = new Episode.model(scrapeEpisode(episodeXML));
                 if (!channel.containsEpisode(episode.getID())) {
-                    selectiveLog("adding episode to channel", logLevel.informational);
+                    winston.log('info', 'adding episode to channel');
                     channel.addEpisode(
                         episode
                     );
                 } else if (options.softUpdate) {
-                    selectiveLog("updating existing episode (soft-update enabled)", logLevel.informational);
+                    winston.log('info', 'updating existing episode (soft-update enabled)');
                     channel.updateEpisode(episode);
                 } else {
-                    selectiveLog("episode already in db, not updating (soft-update not enabled)", logLevel.informational);
+                    winston.log('info', 'episode already in db, not updating (soft-update not enabled)');
                 }
             });
 
