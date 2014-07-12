@@ -2,23 +2,6 @@ var minimistArgv = require('minimist')(process.argv.slice(2)),
     path = require('path'),
     _ = require('lodash');
 
-function commandLineArguments() {
-    var commandArguments = {
-        /* Level of optional warnings to log (refer to logging.js for more accurate information)
-             1 - errors
-             2 - critical warnings + (above)
-             3 - normal warnings + (above)
-             4 - all warnings + (above)
-             5 - informational + (above)
-         */
-        warn_level: 1
-    };
-
-    commandArguments.warn_level = minimistArgv.warn || commandArguments.warn_level;
-
-    return commandArguments;
-}
-
 function podcastXMLSource() {
     var XMLSource = [];
 
@@ -76,7 +59,6 @@ function podcastXMLSource() {
 
 module.exports = {
     mongoURL: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URL || 'mongodb://localhost/podcasts',
-    cmd_args: commandLineArguments(),
     XMLSource: podcastXMLSource(),
     softUpdate: minimistArgv['soft-update'] || false,
     getSourcesFromDB: minimistArgv['db-sources'] || false
