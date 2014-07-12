@@ -1,6 +1,9 @@
 /** @module Channel */
 
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    _ = require('lodash');
+
+var PodcastSource = require('../models/PodcastSource');
 
 var configFromFile = require('./src/config');
 
@@ -48,12 +51,39 @@ function scraper(config) {
 
     function main() {
 
-        if (!config.XMLSource.length) {
-            console.warn("No sources defined, exiting program.");
+        setUp(config.mongoURL);
+
+        var sourcesList = [];
+
+        if (config.getSourcesFromDB) {
+            PodcastSource.getFromDatabase(startRunning);
         } else {
-            setUp(config.mongoURL);
-            processing.runOnSource(
+            sourcesList = _.map(
                 config.XMLSource,
+                function(sourceEntry) {
+                    var sourceModel = new PodcastSource.model(sourceEntry);
+                    if (sourceEntry.saveToDB) {
+                        sourceModel.save();
+                    }
+                    return sourceModel;
+                }
+            );
+            startRunning(null, sourcesList);
+        }
+
+        function startRunning(err, sourcesList) {
+            if (err) {
+                console.error(err);
+                throw err;
+            }
+
+            if (!sourcesList.length) {
+                console.warn("No sources defined, exiting program.");
+                return tearDown();
+            }
+
+            processing.runOnSource(
+                sourcesList,
                 /**
                  * Called when each source has completed scraping, or on an error.
                  * @param  {Error} err   Error encountered, if any
