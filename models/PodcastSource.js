@@ -9,7 +9,10 @@ var PodcastSourceSchema = mongoose.Schema( {
 
 var PodcastSource = mongoose.model('PodcastSource', PodcastSourceSchema);
 
-
+/**
+ * Retrieves a list of PodcastSources from the database and passes them to the callback.
+ * @param  {Function} callback callback that will be called with an error or the list of sources.
+ */
 function getFromDatabase(callback) {
     PodcastSource.find(
         function(err, sources) {

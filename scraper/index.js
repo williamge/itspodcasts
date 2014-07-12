@@ -38,6 +38,12 @@ function scraper(config) {
      * @param {doneCallback} done callback to call when operations are done, or on error
      */
 
+
+    /**
+     * Sets up required state for running application:
+     *     - Connects mongoose to database
+     * @param {String} mongoURL URI to MongoDB database(s) to connect to
+     */
     function setUp(mongoURL) {
         mongoose.connect(mongoURL);
 
@@ -47,11 +53,19 @@ function scraper(config) {
         });
     }
 
+    /**
+     * Tears down the state of the application and exits the process.
+     */
     function tearDown() {
         winston.info('Exiting gracefully');
         process.exit();
     }
 
+    /**
+     * Does everything. Gets the sources, runs setUp for the application,
+     * retrieves the sources, and runs the processing. Mostly just a function to glue
+     * together the processing operations inside an application.
+     */
     function main() {
 
         setUp(config.mongoURL);

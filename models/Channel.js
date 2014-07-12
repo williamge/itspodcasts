@@ -20,10 +20,19 @@ ChannelSchema.methods.getID = function() {
     return this.title;
 };
 
+/**
+ * Returns a list of episodes that have been updated during this model's
+ * lifetime.
+ * @return {Array} List of updated Episode models
+ */
 ChannelSchema.methods.getUpdatedEpisodes = function() {
     return this._updatedEpisodes || [];
 };
 
+/**
+ * Returns a list of episodes that have been added during this model's lifetime.
+ * @return {Array} List of added Episode models
+ */
 ChannelSchema.methods.getAddedEpisodes = function() {
     return this._addedEpisodes || [];
 };
@@ -48,6 +57,10 @@ ChannelSchema.methods.addEpisode = function(episode) {
     this._addedEpisodes.push(episode);
 };
 
+/**
+ * Updates an Episode for the current channel and keeps track of the updated Episodes
+ * @param  {Episode} episode Episode to be updated for the current Channel
+ */
 ChannelSchema.methods.updateEpisode = function(episode) {
     if (!(episode instanceof Episode.model)) {
         throw new TypeError("Passed episode not of type Episode");
@@ -61,10 +74,19 @@ ChannelSchema.methods.updateEpisode = function(episode) {
     this._updatedEpisodes.push(episode);
 };
 
+/**
+ * Returns whether this channel has an episode with the given id
+ * @param  {String} id id to look up an episode in this channel
+ * @return {Boolean}    True when this channel has that episode id
+ */
 ChannelSchema.methods.containsEpisode = function(id) {
     return this.episodes.indexOf( id ) > -1;
 };
 
+/**
+ * Saves the channel and it's episodes (added and updated) to the database.
+ * @param  {Function} callback callback to be called on error or when the channel and episodes have been saved
+ */
 ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
     
     //This would be a nice place to use a bulk insert operation, mongoose doesn't have that though
