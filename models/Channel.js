@@ -151,34 +151,6 @@ ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
     });
 };
 
-ChannelSchema.statics.getEpisodes = function(callingOptions, callback) {
-
-    if ('function' === typeof callingOptions) {
-        callback = callingOptions;
-        callingOptions = null;
-    }
-
-    var defaultOptions = {
-        limit: 50
-    };
-
-    var options = _.extend(defaultOptions, callingOptions);
-
-    var aggregate = Episode.model.find();
-
-    if (options.sort) {
-        aggregate = aggregate.sort(
-            options.sort
-        );
-    }
-
-    if ( typeof options.limit !== 'undefined' ) {
-        aggregate = aggregate.limit( options.limit );
-    }
-
-    aggregate.exec(callback);
-};
-
 var Channel = mongoose.model('Channel', ChannelSchema);
 
 module.exports = {

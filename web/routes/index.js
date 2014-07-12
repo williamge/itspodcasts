@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
 
 exports.index = function(req, res) {
 
-    Channel.model.getEpisodes({
+    Episode.model.getEpisodes({
             sort: {
                 pubDate: -1
             }
