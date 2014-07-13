@@ -59,3 +59,17 @@ li.episode-container:hover {
     text-decoration: none;
     text-align: center;
 }
+
+.header {
+    max-width: 940px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.menu {
+    background-color: #eee;
+}
+
+.menu > li {
+    display: inline-block;
+}
