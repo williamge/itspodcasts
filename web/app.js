@@ -32,6 +32,7 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/all', routes.allChannels);
+app.get('/channel/:channelid', routes.channel);
 
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));

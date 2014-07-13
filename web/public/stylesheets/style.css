@@ -20,6 +20,10 @@ li.episode-container {
     border-top: 4px solid orange;
 }
 
+li.episode-container:hover {
+    background-color: #eee;
+}
+
 .channel {
     
     display: inline-block;
@@ -33,7 +37,17 @@ li.episode-container {
     margin: 0 1em;
 }
 
+.channel-link {
+    color: #555;
+    text-decoration: none;
+}
+
+.channel-link:hover {
+    text-decoration: underline;
+}
+
 .link {
     font-style: italic;
     font-size: 0.9em;
+    display: block;
 }
