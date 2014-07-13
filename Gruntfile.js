@@ -30,6 +30,14 @@ module.exports = function (grunt) {
         },
         jshint: {
             all: ["scraper/**/*.js", "web/**/*.js"]
+        },
+        watch: {
+            options : {
+                livereload: true
+            },
+            scripts: {
+                files: ['web/**/*.jade', 'web/**/*.css']
+            }
         }
     });
 
@@ -37,6 +45,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsbeautifier');
     grunt.loadNpmTasks('grunt-githooks');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task(s).
     grunt.registerTask('default', ['jsbeautifier']);
