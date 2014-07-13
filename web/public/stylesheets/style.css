@@ -51,3 +51,11 @@ li.episode-container:hover {
     font-size: 0.9em;
     display: block;
 }
+
+.see-more {
+    font-size: 0.9em;
+    display: block;
+    color: #555;
+    text-decoration: none;
+    text-align: center;
+}

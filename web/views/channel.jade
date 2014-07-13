@@ -11,3 +11,4 @@ block content
                     p.date=episode.pubDate.toUTCString() || "No date"
                     a.link(href=episode.link)=episode.link
                     p.description=episode.description
+        a.see-more(href='/channel/' + channel.id + '/episodes')="See more"

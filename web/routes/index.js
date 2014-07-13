@@ -69,3 +69,31 @@ exports.channel = function(req, res) {
             }
     );
 };
+
+exports.channelEpisodes = function(req, res) {
+
+    if (!req.params.channelid) {
+        winston.error("Channel ID not found", req);
+        return res.send(404, "Sorry, we couldn't find that channel");
+    }
+
+    Channel.model.findOne({
+        _id: req.params.channelid
+    })
+        .populate({
+            path: 'episodes',
+            options: {
+                sort: {
+                    'pubDate': -1
+                }
+            }
+        })
+        .exec(
+            function(err, channel) {
+                res.render('channelEpisodes', {
+                    title: channel.title,
+                    channel: channel
+                });
+            }
+    );
+};
