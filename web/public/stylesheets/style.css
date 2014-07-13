@@ -8,21 +8,32 @@ a {
 }
 
 ul.episodes-list {
-
+    list-style: none;
+    padding: 0.5em;
 }
 
 li.episode-container {
     margin-left: auto;
     margin-right: auto;
     max-width: 700px;
+
+    border-top: 4px solid orange;
 }
 
 .channel {
-    font-style: italic;
+    
+    display: inline-block;
+    margin: 0.5em 0;
 }
 
 .date {
-    font-style: italic;
     color: #aaa;
+    font-size: 0.75em;
+    display: inline-block;
+    margin: 0 1em;
 }
 
+.link {
+    font-style: italic;
+    font-size: 0.9em;
+}
