@@ -1,5 +1,7 @@
 extends layout
 
+include mixins/episodeBox.jade
+
 block content
     h2=channel.title
     div
@@ -7,8 +9,5 @@ block content
         ul
             each episode, j in channel.episodes
                 li.episode-container
-                    h3=episode.title
-                    p.date=episode.pubDate.toUTCString() || "No date"
-                    a.link(href=episode.link)=episode.link
-                    p.description=episode.description
+                    +episodeBox(episode)
         a.see-more(href='/channel/' + channel.id + '/episodes')="See more"

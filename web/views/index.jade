@@ -1,13 +1,9 @@
 extends layout
 
+include mixins/episodeBox.jade
+
 block content
     ul.episodes-list
         each episode, i in episodes
             li.episode-container
-                h3
-                    a.link(href='/episode/' + linkFunction(episode.id))=episode.title
-                h4.channel
-                    a.channel-link(href='/channel/' + episode.channel)=episode.channelTitle
-                p.date=episode.pubDate.toUTCString() || "No date"
-                a.link(href=episode.link)=episode.link
-                p.description=episode.description
+                +episodeBox(episode)
