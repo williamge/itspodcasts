@@ -1,6 +1,8 @@
 var mongoose = require('mongoose'),
+    _ = require('lodash'),
     Channel = require('../../models/Channel'),
-    Episode = require('../../models/Episode');
+    Episode = require('../../models/Episode'),
+    safeBase64 = require('../../models/safeBase64');
 
 
 /*
@@ -19,9 +21,11 @@ exports.index = function(req, res) {
                 console.error("Index page Channel#getEpisodes error: " +
                     err);
             }
+
             res.render('index', {
                 title: 'It\'s podcasts',
-                episodes: episodes || []
+                episodes: episodes || [],
+                linkFunction: safeBase64.makeSafeFromString
             });
         }
     );
@@ -65,6 +69,30 @@ exports.channel = function(req, res) {
                 res.render('channel', {
                     title: channel.title,
                     channel: channel
+                });
+            }
+    );
+};
+
+exports.episode = function(req, res) {
+
+    if (!req.params.episodeid) {
+        winston.error("Channel ID not found", req);
+        return res.send(404, "Sorry, we couldn't find that episode");
+    }
+
+    var episodeID = safeBase64.makeStringFromSafe(req.params.episodeid);
+
+    Episode.model.findOne({
+        _id: episodeID
+    })
+        .exec(
+            function(err, episode) {
+                if (!episode) {
+                    return res.send(404, "Sorry, we couldn't find that episode");
+                }
+                res.render('episode', {
+                    episode: episode
                 });
             }
     );

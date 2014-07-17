@@ -3,7 +3,7 @@ extends layout
 block content
     each channel, i in channels
         li 
-            span=channel.title
-                ul
-                    each episode, j in channel.episodes
-                        li=episode.title
+            a.channel-link(href='/channel/' + channel.id)=channel.title
+            ul
+                each episode, j in channel.episodes
+                    li=episode.title

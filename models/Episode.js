@@ -1,7 +1,8 @@
 /** @module Channel */
 
 var mongoose = require('mongoose'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    safeBase64 = require('./safeBase64');
 
 var EpisodeSchema = mongoose.Schema( {
     _id: String,
@@ -38,6 +39,10 @@ EpisodeSchema.methods.getID = function() {
     }
     return this._id;
 };
+
+EpisodeSchema.virtual('URLsafeID').get(function () {
+    return safeBase64.makeSafeFromString(this.id);
+});
 
 /**
  * Retrieves a list of all episode objects, with a limit of 50 by default. Limit and 

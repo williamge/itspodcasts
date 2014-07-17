@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    li.episode-container
+        h3=episode.title
+        h4.channel
+            a.channel-link(href='/channel/' + episode.channel)=episode.channelTitle
+        p.date=episode.pubDate.toUTCString() || "No date"
+        a.link(href=episode.link)=episode.link
+        p.description=episode.description
