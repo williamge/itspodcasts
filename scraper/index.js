@@ -89,7 +89,9 @@ function scraper(config) {
                             function(err) {
                                 //intentionally not using a callback from here, 
                                 //we only care enough about the write to log an error
-                                winston.error(err);
+                                if (err) {
+                                    winston.error('Error saving source to database. [' + sourceEntry.source + ']', err);
+                                }
                             }
                         );
                         winston.info('Saving source to database: ' + sourceEntry.source);
@@ -107,7 +109,8 @@ function scraper(config) {
             }
 
             if (!sourcesList.length) {
-                winston.warn("No sources defined, exiting program.");
+                winston.warn("No sources defined, exiting program." + "\n" +
+                    config.cmdline_help_text);
                 return tearDown();
             }
 

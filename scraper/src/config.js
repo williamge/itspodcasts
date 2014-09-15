@@ -2,12 +2,23 @@ var minimistArgv = require('minimist')(process.argv.slice(2)),
     path = require('path'),
     _ = require('lodash');
 
+var cmdline_help_text = "Available arguments:\n" +
+    "The following options will allow you to save the source by appending a comma and 'y', 'yes', or 'save' after the source location\n" +
+    "--rss : Specify an RSS feed URL to scrape from\n" +
+    "--file : Specify an XML file to read\n" +
+    "--sources : Specify a JSON file containing sources to scrape from\n" +
+    "" +
+    "--db-sources : Scrape the sources that are already saved\n" +
+    "" +
+    "--soft-update : Update episodes and channels that have already been scraped in addition to adding new episodes, " +
+    "will not delete episodes or channels that have already been scraped";
+
 function podcastXMLSource() {
     var XMLSource = [];
 
     function interpretSaveOption(argument) {
         if (!argument) {
-            return !argument;
+            return argument;
         }
 
         return (new RegExp("^(y|yes|save)$", "i")).test(argument);
@@ -61,5 +72,6 @@ module.exports = {
     mongoURL: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URL || 'mongodb://localhost/podcasts',
     XMLSource: podcastXMLSource(),
     softUpdate: minimistArgv['soft-update'] || false,
-    getSourcesFromDB: minimistArgv['db-sources'] || false
+    getSourcesFromDB: minimistArgv['db-sources'] || false,
+    cmdline_help_text: cmdline_help_text
 };
