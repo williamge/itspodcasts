@@ -3,7 +3,13 @@
 var xml2js = require('xml2js'),
     async = require('async'),
     _ = require('lodash'),
-    winston = require('winston');
+    winston = require('winston'),
+    request = require('request'),
+    mongodb = require('mongodb'),
+    mongoose = require('mongoose');
+
+var PImage = require('../../models/PImage');
+
 
 var selectiveLog = require('./logging'),
     logLevel = selectiveLog.logLevels;
@@ -79,8 +85,62 @@ module.exports = function(Channel, Episode, options) {
                 }
             });
 
-            return callback(err, channel);
+            if (!channelXML.image) {
+                return callback(null, channel);
+            } else {
+                var imageURL = channelXML.image[0].url[0];
+
+                var lastImage = channel.getLastImage();
+
+                if (options.softUpdate || lastImage && lastImage.originalURL === imageURL) {
+                    winston.info("Not updating image for channel [" + channel.title + "], already at the latest (soft update is off)");
+                    return callback(null, channel);
+                } else {
+                    requestImage(imageURL,
+                        function(err, imageResponse) {
+                            if (err) {
+                                winston.error("Error scraping image at URL [" + imageURL + "], channel [" + channel.title + "]: " + err.toString());
+                                return callback(null, channel);
+                            }
+
+                            var scrapedImage = new PImage.model({
+                                originalURL: imageURL
+                            });
+
+                            scrapedImage.saveImage(imageResponse,
+                                function(err, savedImage) {
+                                    if (err) {
+                                        winston.error("Error saving image [" + imageURL + "] for channel [" + channel.title + "]: " + err);
+                                        return callback(null, channel);
+                                    }
+                                    winston.info("Saved image for channel [" + channel.title + "] (soft update: " + options.softUpdate + ")");
+                                    channel.images.push(savedImage);
+                                    return callback(null, channel);
+                                });
+                        }
+                    );
+                }
+            }
         });
+    }
+
+    function requestImage(url, callback) {
+        request.get(url, {
+                encoding: null
+            },
+            function(err, response, body) {
+                if (err) {
+                    return callback(err);
+                }
+                switch (response.statusCode) {
+                    case 200:
+                        var grid = new mongodb.Grid(mongoose.connection.db, 'channel_images');
+                        return callback(err, body);
+                    default:
+                        return callback(err);
+                }
+            }
+        );
     }
 
     /**

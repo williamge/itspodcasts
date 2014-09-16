@@ -5,11 +5,13 @@ var mongoose = require('mongoose'),
     async = require('async'),
     assert = require('assert');
 
-var Episode = require('./Episode');
+var Episode = require('./Episode'),
+    PImage = require('./PImage');
 
 var ChannelSchema = mongoose.Schema( {
     title: { type: String, required: true },
-    episodes: [ { type: String, ref: 'Episode' } ]
+    episodes: [ { type: String, ref: 'Episode' } ],
+    images: [PImage.schema]
 });
 
 /**
@@ -149,6 +151,14 @@ ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
             }
         );
     });
+};
+
+ChannelSchema.methods.getLastImage = function() {
+    if (this.images.length > 0) {
+        return this.images[this.images.length-1];
+    } else {
+        return null;
+    }
 };
 
 var Channel = mongoose.model('Channel', ChannelSchema);
