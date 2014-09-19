@@ -9,7 +9,8 @@ var mongoose = require('mongoose'),
 var testHelpers = require('./testHelpers');
 
 var Channel = require('../models/Channel'),
-    Episode = require('../models/Episode');
+    Episode = require('../models/Episode'),
+    PImage = require('../models/PImage');
 
 var Channel,
     db;
@@ -239,6 +240,66 @@ describe( 'Channel', function() {
                         } );
                     }
                 ).to.throw(TypeError);
+            }
+        );
+    });
+
+    describe('#getLastImage()', function() {
+
+        var testChannel;
+
+        beforeEach( function() {
+            testChannel = new Channel.model( { title: 'test channel' } );
+            testChannel.addEpisode( new Episode.model( {
+                title: 'title',
+                link:'link',
+                description:'description',
+                guid: 'guid'
+            } ) );
+        });
+
+        it('should return the last image from a channel when there is one image',
+            function() {
+                testChannel.images.push( new PImage.model() );
+                expect(testChannel.getLastImage()).to.ok;
+            }
+        );
+
+        it('should return the last image from a channel when there are several images',
+            function() {
+                testChannel.images.push( new PImage.model( { originalURL: 'image1' } ) );
+                testChannel.images.push( new PImage.model( { originalURL: 'image2' } ) );
+                testChannel.images.push( new PImage.model( { originalURL: 'image3' } ) );
+
+                expect(testChannel.getLastImage()).to.have.property('originalURL').equal('image3');
+            }
+        );
+
+        it('should return the last image from a channel from the db when there are several images',
+            function(done) {
+                testChannel.images.push( new PImage.model( { originalURL: 'image1' } ) );
+                testChannel.images.push( new PImage.model( { originalURL: 'image2' } ) );
+                testChannel.images.push( new PImage.model( { originalURL: 'image3' } ) );
+
+                testChannel.save(
+                    function(err) {
+                        expect(err).to.not.be.ok;
+                        Channel.model.findOne( { title: 'test channel' },
+                            function(err, db_channel) {
+                                expect(err).to.not.be.ok;
+                                var wat = db_channel.getLastImage();
+                                expect(db_channel.getLastImage()).to.have.property('originalURL').equal('image3');
+                                done();
+                            }
+                        );
+                    }
+                );
+            }
+        );
+
+        it('should return null when there are no images in the channel',
+            function() {
+                expect(testChannel.getLastImage()).to.equal(null);
             }
         );
     });
