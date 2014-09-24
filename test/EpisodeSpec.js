@@ -182,7 +182,7 @@ describe( 'Episode', function() {
 
             it('with no options set, 50 of all of the episodes in all channels', 
                 function(done) {
-                    Episode.model.getEpisodes( 
+                    Episode.model.getEpisodesNow(
                         {},
                         function(err, episodes) {
                             if (err) return done(err);
@@ -201,7 +201,7 @@ describe( 'Episode', function() {
             
             it('as many of all episodes in all of the channels as the limit option is set to',
                 function(done) {
-                    Episode.model.getEpisodes( 
+                    Episode.model.getEpisodesNow(
                         { limit: 5 },
                         function(err, episodes) {
                             if (err) return done(err);
@@ -220,7 +220,7 @@ describe( 'Episode', function() {
 
             it('all episodes in all channels sorted by the field defined in the sort option',
                 function(done) {
-                    Episode.model.getEpisodes( 
+                    Episode.model.getEpisodesNow(
                         { 
                             sort: {
                                 title: -1
@@ -244,7 +244,7 @@ describe( 'Episode', function() {
 
             it('65 of all of the episodes in all of the channels, sorted descending by pubDate, if the proper options are set', 
                 function(done) {
-                    Episode.model.getEpisodes( 
+                    Episode.model.getEpisodesNow(
                         { 
                             limit: 65,
                             sort: {

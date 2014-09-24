@@ -12,10 +12,10 @@ var mongoose = require('mongoose'),
 exports.index = function(req, res) {
 
     Episode.model.getEpisodes({
-            sort: {
-                pubDate: -1
-            }
-        },
+        sort: {
+            pubDate: -1
+        }
+    }).populate('channel').exec(
         function(err, episodes) {
             if (err) {
                 console.error("Index page Channel#getEpisodes error: " +
@@ -86,6 +86,7 @@ exports.episode = function(req, res) {
     Episode.model.findOne({
         _id: episodeID
     })
+        .populate('channel')
         .exec(
             function(err, episode) {
                 if (!episode) {

@@ -75,7 +75,11 @@ EpisodeSchema.statics.getEpisodes = function(callingOptions, callback) {
         aggregate = aggregate.limit( options.limit );
     }
 
-    aggregate.exec(callback);
+    return aggregate;
+};
+
+EpisodeSchema.statics.getEpisodesNow = function(callingOptions, callback) {
+    this.getEpisodes(callingOptions).exec(callback);
 };
 
 var Episode = mongoose.model('Episode', EpisodeSchema);
