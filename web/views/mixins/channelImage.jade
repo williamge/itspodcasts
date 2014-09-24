@@ -1,0 +1,4 @@
+mixin channelImage(channel, size)
+    if channel.getLastImage()
+        .channel-image(class=size)
+            img(src='/channel_images/' + channel.getLastImage()._id)

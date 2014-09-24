@@ -1,7 +1,9 @@
 extends layout
 
 include mixins/episodeBox.jade
+include mixins/channelImage.jade
 
 block content
     li.episode-container
+        +channelImage(episode.channel, 'small')
         +episodeBox(episode)

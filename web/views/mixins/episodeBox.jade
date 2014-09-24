@@ -1,8 +1,8 @@
 mixin episodeBox(episode) 
     h3
         a.link(href='/episode/' + episode.URLsafeID)=episode.title
-    h4.channel
-        a.channel-link(href='/channel/' + episode.channel)=episode.channelTitle
+    h4.channel-title
+        a.channel-link(href='/channel/' + episode.channel._id)=episode.channelTitle
     p.date=episode.pubDate.toUTCString() || "No date"
     a.link(href=episode.link)=episode.link
     p.description=episode.description
