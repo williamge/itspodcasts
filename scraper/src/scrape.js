@@ -93,6 +93,7 @@ module.exports = function(Channel, Episode, options) {
                 var lastImage = channel.getLastImage();
 
                 if (options.softUpdate || lastImage && lastImage.originalURL === imageURL) {
+                if (!options.softUpdate && lastImage && lastImage.originalURL === imageURL) {
                     winston.info("Not updating image for channel [" + channel.title + "], already at the latest (soft update is off)");
                     return callback(null, channel);
                 } else {
