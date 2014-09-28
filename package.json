@@ -1,7 +1,7 @@
 {
     "name": "itspodcasts",
     "description": "A website and scraper for podcasts.",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": "williamg",
     "repository": {
         "type": "git",
