@@ -133,6 +133,9 @@ ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
                                         if (err) {
                                             return next(err);
                                         }
+                                        if (!episodeFromDB) {
+                                            return next(new ReferenceError("Episode[" + episode.getID() + "] was not found in the database"));
+                                        }
                                         assert( !channel.isNew );
 
                                         var updatedEpisode = _.extend(episodeFromDB, episode._doc );
