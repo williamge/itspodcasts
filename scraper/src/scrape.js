@@ -1,12 +1,13 @@
 /** @module scrape */
 
-var xml2js = require('xml2js'),
-    async = require('async'),
+var async = require('async'),
     _ = require('lodash'),
     winston = require('winston'),
     request = require('request'),
     mongodb = require('mongodb'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    cheerio = require('cheerio'),
+    Str = require('string');
 
 var PImage = require('../../models/PImage');
 
@@ -34,18 +35,21 @@ module.exports = function(Channel, Episode, options) {
      * @return {Object} An object with the scraped values of the episode in element
      */
     function scrapeEpisode(element) {
+        element = cheerio.load(element, {
+            xmlMode: true
+        });
         var episode = {
-            title: element.title[0],
-            link: element.link[0],
-            description: (element.description[0]._ || element.description[0])
+            title: element('title').text(),
+            link: element('link').text(),
+            description: Str(element('description').text()).stripTags().s
         };
 
-        if (element.pubDate) {
-            episode.pubDate = element.pubDate;
+        if (element('pubDate')) {
+            episode.pubDate = element('pubDate').text();
         }
 
-        if (element.guid) {
-            episode.guid = element.guid[0]._ || element.guid[0];
+        if (element('guid')) {
+            episode.guid = element('guid').text();
         }
 
         return episode;
@@ -58,19 +62,22 @@ module.exports = function(Channel, Episode, options) {
      */
     function scrapeChannel(channelXML, callback) {
 
+        channelXML = cheerio.load(channelXML, {
+            xmlMode: true
+        });
         Channel.model.findOne({
-            title: channelXML.title[0]
+            title: channelXML('channel > title').text()
         }, function elementResult(err, channel) {
             if (!channel) {
                 channel = new Channel.model({
-                    title: channelXML.title[0]
+                    title: channelXML('channel > title').text()
                 });
                 winston.info('Channel: [' + channel.title + '] was not found in the database');
             }
 
-            var episodes = channelXML.item;
+            var episodes = channelXML('item');
 
-            episodes.forEach(function(episodeXML) {
+            episodes.each(function(i, episodeXML) {
                 var episode = new Episode.model(scrapeEpisode(episodeXML));
                 if (!channel.containsEpisode(episode.getID())) {
                     winston.log('info', 'adding episode to channel');
@@ -85,14 +92,13 @@ module.exports = function(Channel, Episode, options) {
                 }
             });
 
-            if (!channelXML.image) {
+            if (!channelXML('image')) {
                 return callback(null, channel);
             } else {
-                var imageURL = channelXML.image[0].url[0];
+                var imageURL = channelXML('image > url').text();
 
                 var lastImage = channel.getLastImage();
 
-                if (options.softUpdate || lastImage && lastImage.originalURL === imageURL) {
                 if (!options.softUpdate && lastImage && lastImage.originalURL === imageURL) {
                     winston.info("Not updating image for channel [" + channel.title + "], already at the latest (soft update is off)");
                     return callback(null, channel);
@@ -152,34 +158,32 @@ module.exports = function(Channel, Episode, options) {
     function scrapeSource(data, callback) {
 
         var channelList = [];
-        xml2js.parseString(data, function(err, result) {
-            if (err) {
-                return callback(err);
-            } else {
-                async.each(
-                    result.rss.channel,
-                    function eachIterator(channel, done) {
-                        scrapeChannel(channel,
-                            function withChannel(err, channel) {
-                                if (err) {
-                                    return done(err);
-                                } else {
-                                    channelList.push(channel);
-                                    return done();
-                                }
-                            }
-                        );
-                    },
-                    function eachFinally(err) {
+        var $ = cheerio.load(data, {
+            xmlMode: true
+        });
+        async.each(
+            //TODO: can i remove this?
+            $('rss > channel'),
+            function eachIterator(channel, done) {
+                scrapeChannel(channel,
+                    function withChannel(err, channel) {
                         if (err) {
-                            return callback(err);
+                            return done(err);
                         } else {
-                            return callback(null, channelList);
+                            channelList.push(channel);
+                            return done();
                         }
                     }
                 );
+            },
+            function eachFinally(err) {
+                if (err) {
+                    return callback(err);
+                } else {
+                    return callback(null, channelList);
+                }
             }
-        });
+        );
     }
 
     return {

@@ -62,12 +62,21 @@ var loadXML = function(path,  callback) {
     );
 };
 
+var loadXMLSync = function(path) {
+   return fs.readFileSync(path);
+};
+
+var testXML = {
+    feed: loadXMLSync(__dirname + '/data/Feed.xml').toString(),
+    episode: loadXMLSync(__dirname + '/data/episode.xml').toString(),
+    channel: loadXMLSync(__dirname + '/data/channel.xml').toString()
+};
+
 
 module.exports = {
     socketExceptionCommand: socketExceptionCommand,
     failPointCommand: failPointCommand,
     runCommand: runCommand,
     mongoTestCommandsEnabled: mongoTestCommandsEnabled,
-    parseXML: parseXML,
-    loadXML: loadXML
+    testXML : testXML
 };
