@@ -7,6 +7,9 @@
         "type": "git",
         "url": "http://github.com/williamge/itspodcasts.git"
     },
+    "engines": {
+        "node": "0.10.x"
+    },
     "private": true,
     "scripts": {
         "test": "mocha test",
