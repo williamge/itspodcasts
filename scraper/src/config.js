@@ -7,9 +7,7 @@ var cmdline_help_text = "Available arguments:\n" +
     "--rss : Specify an RSS feed URL to scrape from\n" +
     "--file : Specify an XML file to read\n" +
     "--sources : Specify a JSON file containing sources to scrape from\n" +
-    "" +
     "--db-sources : Scrape the sources that are already saved\n" +
-    "" +
     "--soft-update : Update episodes and channels that have already been scraped in addition to adding new episodes, " +
     "will not delete episodes or channels that have already been scraped";
 
@@ -22,29 +20,6 @@ function podcastXMLSource() {
         }
 
         return (new RegExp("^(y|yes|save)$", "i")).test(argument);
-    }
-
-    if (minimistArgv.rss) {
-        var rssArgSplit = minimistArgv.rss.split(",");
-        var rssURL = rssArgSplit[0];
-        var saveRssSourceToDB = interpretSaveOption(rssArgSplit[1]) || false;
-        XMLSource.push({
-            type: "rss",
-            source: rssURL,
-            saveToDB: saveRssSourceToDB
-        });
-    }
-
-    if (minimistArgv.file) {
-        var fileArgSplit = minimistArgv.file.split(",");
-        var fileURL = fileArgSplit[0];
-        var saveFileSourceToDB = interpretSaveOption(fileArgSplit[1]) || false;
-
-        XMLSource.push({
-            type: "file",
-            source: path.resolve(minimistArgv.file),
-            saveToDB: saveFileSourceToDB
-        });
     }
 
     if (minimistArgv.sources) {
@@ -60,6 +35,42 @@ function podcastXMLSource() {
             function(sourceItem) {
                 return _.extend(sourceItem, {
                     saveToDB: saveSourcesFileSourceToDB
+                });
+            }
+        );
+    }
+
+    if (minimistArgv.rss) {
+        if (_.isString(minimistArgv.rss)) {
+            minimistArgv.rss = [minimistArgv.rss];
+        }
+        _.each(minimistArgv.rss,
+            function(rssFeed) {
+                var rssArgSplit = rssFeed.split(",");
+                var rssURL = rssArgSplit[0];
+                var saveRssSourceToDB = interpretSaveOption(rssArgSplit[1]) || false;
+                XMLSource.push({
+                    type: "rss",
+                    source: rssURL,
+                    saveToDB: saveRssSourceToDB
+                });
+            });
+    }
+
+    if (minimistArgv.file) {
+        if (_.isString(minimistArgv.file)) {
+            minimistArgv.file = [minimistArgv.file];
+        }
+        _.each(minimistArgv.file,
+            function(fileFeed) {
+                var fileArgSplit = fileFeed.split(",");
+                var fileURL = fileArgSplit[0];
+                var saveFileSourceToDB = interpretSaveOption(fileArgSplit[1]) || false;
+
+                XMLSource.push({
+                    type: "file",
+                    source: path.resolve(fileURL),
+                    saveToDB: saveFileSourceToDB
                 });
             }
         );
