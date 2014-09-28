@@ -59,7 +59,7 @@ describe( 'processing', function() {
         it( 'should scrape an XML file read from disk', 
             function(done) {
                 processing.readXMLFile(
-                    path.resolve("test/data/feed.xml"),
+                    path.resolve("test/data/Feed.xml"),
                     function verifyXMLData (err, XML) {
                         //TODO: xml2js isn't used for anything except this, this test should switch to another method
                         xml2js.parseString( XML, function( err, result ) {
