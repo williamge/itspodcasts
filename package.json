@@ -1,36 +1,42 @@
 {
-  "name": "itspodcasts",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "test": "mocha test",
-    "test.cov": "mocha -r jscoverage --covout=html --covinject=true test",
-    "scraper": "node scraper/index.js",
-    "web": "node web/app.js"
-  },
-  "dependencies": {
-    "xml2js": "~0.4.3",
-    "mongodb": "~1.4.4",
-    "mongoose": "~3.8.12",
-    "request": "~2.36.0",
-    "minimist": "~0.2.0",
-    "async": "~0.9.0",
-    "express": "~3.4.8",
-    "jade": "*",
-    "lodash": "~2.4.1",
-    "winston": "~0.7.3",
-    "cheerio": "~0.17.0",
-    "string": "~2.1.0"
-  },
-  "devDependencies": {
-    "chai": "*",
-    "mocha": "~1.19.0",
-    "grunt-jsbeautifier": "~0.2.7",
-    "grunt": "~0.4.5",
-    "grunt-githooks": "~0.3.1",
-    "grunt-contrib-jshint": "~0.10.0",
-    "jscoverage": "~0.5.4",
-    "sinon": "~1.10.2",
-    "grunt-contrib-watch": "~0.6.1"
-  }
+    "name": "itspodcasts",
+    "description": "A website and scraper for podcasts.",
+    "version": "0.0.1",
+    "author": "williamg",
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/williamge/itspodcasts.git"
+    },
+    "private": true,
+    "scripts": {
+        "test": "mocha test",
+        "test.cov": "mocha -r jscoverage --covout=html --covinject=true test",
+        "scraper": "node scraper/index.js",
+        "web": "node web/app.js"
+    },
+    "dependencies": {
+        "xml2js": "~0.4.3",
+        "mongodb": "~1.4.4",
+        "mongoose": "~3.8.12",
+        "request": "~2.36.0",
+        "minimist": "~0.2.0",
+        "async": "~0.9.0",
+        "express": "~3.4.8",
+        "jade": "*",
+        "lodash": "~2.4.1",
+        "winston": "~0.7.3",
+        "cheerio": "~0.17.0",
+        "string": "~2.1.0"
+    },
+    "devDependencies": {
+        "chai": "*",
+        "mocha": "~1.19.0",
+        "grunt-jsbeautifier": "~0.2.7",
+        "grunt": "~0.4.5",
+        "grunt-githooks": "~0.3.1",
+        "grunt-contrib-jshint": "~0.10.0",
+        "jscoverage": "~0.5.4",
+        "sinon": "~1.10.2",
+        "grunt-contrib-watch": "~0.6.1"
+    }
 }
