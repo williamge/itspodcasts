@@ -92,7 +92,7 @@ module.exports = function(Channel, Episode, options) {
                 }
             });
 
-            if (!channelXML('image')) {
+            if (channelXML('image').length === 0) {
                 return callback(null, channel);
             } else {
                 var imageURL = channelXML('image > url').text();
