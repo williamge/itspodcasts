@@ -2,10 +2,7 @@
 
 var expect = require('chai').expect;
 
-var xml2js = require('xml2js'),
-    parseString = xml2js.parseString,
-    fs = require('fs'),
-    mongoose = require('mongoose'),
+var mongoose = require('mongoose'),
     _ = require('lodash');
 
 var testHelpers = require('./testHelpers');
@@ -26,10 +23,7 @@ after(function(done) {
 
 describe('scrape', function() {
 
-    var xmlAsString, xml, xml_channel, xml_episode;
     var testXML = testHelpers.testXML;
-
-
 
     describe( '#scrapeEpisode()', function() {
         it( 'should return an episode object', function() {

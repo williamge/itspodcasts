@@ -17,17 +17,21 @@ var Channel = require('../models/Channel'),
 
 var testXML;
 
-before(function(done) {
-    fs.readFile(
-        path.resolve("test/test.xml"),
-        function(err, XML) {
-            if (err) throw err;
+before(
+    function loadXMLTestData(done) {
+        fs.readFile(
+            path.resolve("test/data/Feed.xml"),
+            function(err, XML) {
+                if (err) {
+                    throw err;
+                }
 
-            testXML = XML;
-            done();
-        }
-    );
-});
+                testXML = XML;
+                done();
+            }
+        );
+    }
+);
 
 beforeEach(function(done) {
     mongoose.connection.db.dropDatabase();
@@ -42,6 +46,7 @@ after(function(done) {
 describe( 'processing', function() {
     function _verifyXMLData(done) {
        return function verifyXMLData (err, XML) {
+           //TODO: xml2js isn't used for anything except this, this test should switch to another method
             xml2js.parseString( XML, function( err, result ) {
                 expect(err).to.not.be.ok;
                 expect(result).to.have.property('rss');
@@ -54,8 +59,9 @@ describe( 'processing', function() {
         it( 'should scrape an XML file read from disk', 
             function(done) {
                 processing.readXMLFile(
-                    path.resolve("test/test.xml"),
+                    path.resolve("test/data/feed.xml"),
                     function verifyXMLData (err, XML) {
+                        //TODO: xml2js isn't used for anything except this, this test should switch to another method
                         xml2js.parseString( XML, function( err, result ) {
                             expect(err).to.not.be.ok;
                             expect(result).to.have.property('rss');

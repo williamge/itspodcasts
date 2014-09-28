@@ -1,7 +1,5 @@
 var _ = require('lodash'),
-    fs = require('fs'),
-    xml2js = require('xml2js'),
-    parseString = xml2js.parseString;
+    fs = require('fs');
 
 var socketExceptionCommand = function(timesToFail) {
     return failPointCommand( 
@@ -26,42 +24,9 @@ var mongoTestCommandsEnabled = function() {
     return process.env.ENABLE_MONGO_TEST_COMMANDS || false;
 };
 
-
-var parseXML = function (xmlString, callback) {
-    xml2js.parseString( xmlString, 
-        function( err, xmlDom ) {
-            if (err) {
-                console.error("Error in parsing XML");
-                return callback(err);
-            } else {
-                try {
-
-                    var output = {};
-
-                    output.xml = xmlString.toString();
-                    output.xmlChannel = xmlDom.rss.channel[0];
-                    output.xmlEpisode = output.xmlChannel.item[0];
-                    return callback(err, output);
-                }
-                catch (e) {
-                    console.error("Error while accesing XML DOM");
-                    return callback(err);
-                }
-            }
-        }
-    );
-};
-
-var loadXML = function(path,  callback) {
-    fs.readFile(path, 
-        function(err, xmlFS) {
-            if (err) return callback(err);
-
-            parseXML(xmlFS.toString(), callback);
-        }
-    );
-};
-
+//Don't hate me for using a sync function, it's only for test code, 
+//run three times ever per test run, and is a lot simpler than
+//the equivalent async code.
 var loadXMLSync = function(path) {
    return fs.readFileSync(path);
 };
