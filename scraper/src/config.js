@@ -2,6 +2,8 @@ var minimistArgv = require('minimist')(process.argv.slice(2)),
     path = require('path'),
     _ = require('lodash');
 
+var PodcastSource = require('../../models/PodcastSource');
+
 var cmdline_help_text = "Available arguments:\n" +
     "The following options will allow you to save the source by appending a comma and 'y', 'yes', or 'save' after the source location\n" +
     "--rss : Specify an RSS feed URL to scrape from\n" +
@@ -33,9 +35,14 @@ function podcastXMLSource() {
 
         XMLSource = _.map(sourcesFileSources,
             function(sourceItem) {
-                return _.extend(sourceItem, {
-                    saveToDB: saveSourcesFileSourceToDB
-                });
+
+                if (sourceItem.type === 'rss' && saveSourcesFileSourceToDB) {
+                    _.extend(sourceItem, {
+                        saveToDB: saveSourcesFileSourceToDB
+                    });
+                }
+
+                return new PodcastSource.model(sourceItem);
             }
         );
     }
@@ -49,11 +56,11 @@ function podcastXMLSource() {
                 var rssArgSplit = rssFeed.split(",");
                 var rssURL = rssArgSplit[0];
                 var saveRssSourceToDB = interpretSaveOption(rssArgSplit[1]) || false;
-                XMLSource.push({
+                XMLSource.push(new PodcastSource.model({
                     type: "rss",
                     source: rssURL,
                     saveToDB: saveRssSourceToDB
-                });
+                }));
             });
     }
 
@@ -65,13 +72,11 @@ function podcastXMLSource() {
             function(fileFeed) {
                 var fileArgSplit = fileFeed.split(",");
                 var fileURL = fileArgSplit[0];
-                var saveFileSourceToDB = interpretSaveOption(fileArgSplit[1]) || false;
 
-                XMLSource.push({
+                XMLSource.push(new PodcastSource.model({
                     type: "file",
-                    source: path.resolve(fileURL),
-                    saveToDB: saveFileSourceToDB
-                });
+                    source: path.resolve(fileURL)
+                }));
             }
         );
     }

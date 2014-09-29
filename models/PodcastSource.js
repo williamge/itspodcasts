@@ -7,6 +7,14 @@ var PodcastSourceSchema = mongoose.Schema( {
     type: String
 });
 
+PodcastSourceSchema.virtual('saveToDB').set(function (saveFlag) {
+   this._saveToDB = saveFlag ;
+});
+
+PodcastSourceSchema.virtual('saveToDB').get(function () {
+    return this._saveToDB || false;
+});
+
 var PodcastSource = mongoose.model('PodcastSource', PodcastSourceSchema);
 
 /**

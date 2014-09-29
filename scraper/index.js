@@ -75,17 +75,15 @@ function scraper(config) {
 
         setUp(config.mongoURL);
 
-        var sourcesList = [];
 
         if (config.getSourcesFromDB) {
             PodcastSource.getFromDatabase(startRunning);
         } else {
-            sourcesList = _.map(
+            _.forEach(
                 config.XMLSource,
                 function(sourceEntry) {
-                    var sourceModel = new PodcastSource.model(sourceEntry);
                     if (sourceEntry.saveToDB) {
-                        sourceModel.save(
+                        sourceEntry.save(
                             function(err) {
                                 //intentionally not using a callback from here, 
                                 //we only care enough about the write to log an error
@@ -96,10 +94,9 @@ function scraper(config) {
                         );
                         winston.info('Saving source to database: ' + sourceEntry.source);
                     }
-                    return sourceModel;
                 }
             );
-            startRunning(null, sourcesList);
+            startRunning(null, config.XMLSource);
         }
 
         function startRunning(err, sourcesList) {
