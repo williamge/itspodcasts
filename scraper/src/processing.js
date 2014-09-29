@@ -138,7 +138,7 @@ module.exports = function(options) {
      * Retrieves the given sources and runs #scrapeXML() on each one, finally calling
      * the given callback when the sources have been parsed and saved.
      * @param  {[PodcastSource]}   sources  List of sources to scrape
-     * @param  {Function} callback callback to run after given soures have been scraped and saved
+     * @param  {Function} callback callback to run after given sources have been scraped and saved
      */
     function runOnSource(sources, callback) {
         async.each(

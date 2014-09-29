@@ -162,7 +162,6 @@ module.exports = function(Channel, Episode, options) {
             xmlMode: true
         });
         async.each(
-            //TODO: can i remove this?
             $('rss > channel'),
             function eachIterator(channel, done) {
                 scrapeChannel(channel,
