@@ -12,7 +12,9 @@ var fs = require('fs');
 
 exports.channel_images = function(req, res) {
 
-    PImage.model.getImage(req.params.image_id,
+    var image_id = req.params.image_id.replace(".jpg", "");
+
+    PImage.model.getImage(image_id,
         function(err, image) {
             if (err) {
                 winston.error(err);
