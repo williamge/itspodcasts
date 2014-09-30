@@ -11,10 +11,6 @@ var async = require('async'),
 
 var PImage = require('../../models/PImage');
 
-
-var selectiveLog = require('./logging'),
-    logLevel = selectiveLog.logLevels;
-
 module.exports = function(Channel, Episode, options) {
 
     options =
@@ -75,22 +71,26 @@ module.exports = function(Channel, Episode, options) {
                 winston.info('Channel: [' + channel.title + '] was not found in the database');
             }
 
-            var episodes = channelXML('item');
+            var episodes = channelXML('item'),
+                seenEpisodeCount = 0;
 
             episodes.each(function(i, episodeXML) {
                 var episode = new Episode.model(scrapeEpisode(episodeXML));
+                seenEpisodeCount++;
                 if (!channel.containsEpisode(episode.getID())) {
                     winston.log('info', 'adding episode to channel');
                     channel.addEpisode(
                         episode
                     );
                 } else if (options.softUpdate) {
-                    winston.log('info', 'updating existing episode (soft-update enabled)');
+                    winston.log('debug', 'updating existing episode (soft-update enabled)');
                     channel.updateEpisode(episode);
                 } else {
-                    winston.log('info', 'episode already in db, not updating (soft-update not enabled)');
+                    winston.log('debug', 'episode already in db, not updating (soft-update not enabled)');
                 }
             });
+
+            winston.log('info', 'saw [%d] episodes in feed', seenEpisodeCount);
 
             if (channelXML('image').length === 0) {
                 return callback(null, channel);
