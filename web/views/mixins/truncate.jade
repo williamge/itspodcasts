@@ -1,0 +1,6 @@
+mixin truncate(text, maxLength)
+    if text.length > maxLength
+        - var slicePoint = (maxLength - 5) / 2
+        = text.slice(0, slicePoint) + " ... " + text.slice(-slicePoint)
+    else
+        = text
