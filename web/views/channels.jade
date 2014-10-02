@@ -1,0 +1,11 @@
+extends layout
+
+include mixins/channelImage.jade
+
+block content
+    ul.channels-mosaic
+        each channel in channels
+            li
+                a.channel-box.channel-link(href='/channel/' + channel.id)
+                    +channelImage(channel, 'medium')
+                    span=channel.title

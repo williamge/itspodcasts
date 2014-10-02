@@ -43,6 +43,26 @@ exports.allContent = function(req, res) {
     );
 };
 
+exports.channels = function(req, res) {
+
+    Channel.model
+        .find()
+        .sort('title')
+        .exec(
+            function(err, channel) {
+                if (err) {
+                    console.error("Index page Channel#getEpisodes error: " +
+                        err);
+                    return res.render(500);
+                }
+                res.render('channels', {
+                    title: 'It\'s podcasts',
+                    channels: channel
+                });
+            }
+    );
+};
+
 exports.channel = function(req, res) {
 
     if (!req.params.channelid) {
@@ -64,6 +84,10 @@ exports.channel = function(req, res) {
         })
         .exec(
             function(err, channel) {
+                if (!channel) {
+                    return res.send(404, "Sorry, we couldn't find that channel");
+                }
+
                 res.render('channel', {
                     title: channel.title,
                     channel: channel

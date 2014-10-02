@@ -1,5 +1,4 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -74,7 +73,6 @@ li.episode-container:hover {
 }
 
 .channel-image {
-    float: left;
     margin: 1em;
 }
 
@@ -87,6 +85,11 @@ li.episode-container:hover {
 .channel-image.small {
     width: 100px;
     height: 100px;
+    float: left;
+}
+
+.channel-image.medium {
+    max-height: 145px;
 }
 
 .channel-image.main {
@@ -105,4 +108,60 @@ li.episode-container:hover {
 
 .channel > h2, .channel > h3 {
     text-align:center
+}
+
+ul.channels-mosaic {
+    list-style: none;
+}
+
+.channels-mosaic {
+    max-width: 960px;
+    overflow: auto;
+
+    margin: 0 auto;
+    padding: 0;
+}
+
+.channel-box {
+    display: inline-block;
+    border: 3px solid #ccc;
+    background-color: #eee;
+    margin: 10px;
+    padding: 0;
+    text-align: center;
+
+    width: 208px;
+    height: 0;
+    padding-bottom: 208px;
+
+    float: left;
+
+    position: relative;
+}
+
+
+.channel-box:hover {
+    border-color: orange;
+}
+
+.channel-box span {
+    position: absolute;
+    bottom: 0.5em;
+    left: 0;
+
+    width: 100%;
+    text-align: center;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-size: 0.9em;
+}
+
+.channel-box .channel-image {
+    display: inline-block;
+    width: 80%;
+    margin-left: 0;
+    margin-right: auto;
 }
