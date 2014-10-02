@@ -77,7 +77,7 @@ module.exports = function(Channel, Episode, options) {
             episodes.each(function(i, episodeXML) {
                 var episode = new Episode.model(scrapeEpisode(episodeXML));
                 seenEpisodeCount++;
-                if (!channel.containsEpisode(episode.getID())) {
+                if (!channel.containsEpisode(episode.getCustomID())) {
                     winston.log('debug', 'adding episode to channel');
                     channel.addEpisode(
                         episode

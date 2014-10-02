@@ -4,16 +4,13 @@ var mongoose = require('mongoose'),
     _ = require('lodash');
 
 var EpisodeSchema = mongoose.Schema( {
-    _id: String,
 
     /*Is this weird??!?! Yes!
     * _id being a string makes it easier to find the episode in the scraper going off of the Channel model through the
     * 'episodes' array/index, for making links and generally referring/finding an Episode model an ObjectId is nicer,
     * hence why we have a string _id and an ObjectId oid, rather than the other way around.
     */
-    oid: {
-        type: mongoose.Schema.Types.ObjectId
-    },
+    customID: String,
     title: String,
     link: String,
     description: String,
@@ -31,11 +28,8 @@ var EpisodeSchema = mongoose.Schema( {
  * Pre-save hook for Episode objects, makes sure that the '_id' attribute is set if it is not already set.
  */
 EpisodeSchema.pre('save', function(next) {
-    if (!this._id) {
-        this._id = this.getID();
-    }
-    if (!this.oid) {
-        this.oid = new mongoose.Types.ObjectId();
+    if (!this.customID) {
+        this.customID = this.getCustomID();
     }
     next();
 });
@@ -44,15 +38,15 @@ EpisodeSchema.pre('save', function(next) {
  * Returns a unique identifier for the current Episode
  * @return {String} Unique ID for the Episode
  */
-EpisodeSchema.methods.getID = function() {
-    if (!this._id) {
-        this._id = this.guid || this.link;
+EpisodeSchema.methods.getCustomID = function() {
+    if (!this.customID) {
+        this.customID = this.guid || this.link;
     }
-    return this._id;
+    return this.customID;
 };
 
 EpisodeSchema.virtual('URLsafeID').get(function () {
-    return this.oid;
+    return this._id;
 });
 
 /**

@@ -57,7 +57,7 @@ describe( 'Episode', function() {
 
                 episode.save( function(err) {
                     if (err) throw err;
-                    Episode.model.findOne(episode.getID(),  
+                    Episode.model.findOne({customID: episode.getCustomID()},
                         function( err, data ){
                             if (err) throw err;
 
@@ -129,7 +129,7 @@ describe( 'Episode', function() {
                 } );
 
                 episode.save( function(err) {
-                    Episode.model.findOne( {_id: episode.getID()} , function(err, result) {
+                    Episode.model.findOne( {_id: episode._id} , function(err, result) {
                         expect(result).to.have.property('title').equal('test title');
                         done();
                     } );

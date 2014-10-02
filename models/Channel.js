@@ -11,6 +11,7 @@ var Episode = require('./Episode'),
 var ChannelSchema = mongoose.Schema( {
     title: { type: String, required: true },
     episodes: [ { type: String, ref: 'Episode' } ],
+    episodeCustomIDs: [String],
     images: [PImage.schema]
 });
 
@@ -49,11 +50,8 @@ ChannelSchema.methods.addEpisode = function(episode) {
         throw new TypeError("Passed episode not of type Episode");
     }
 
-    //getID also sets the _id for the episode, which is needed to be able
-    //to search episodes by id if you don't save before searching.
-    //TODO: do something about this call to make it not look so odd
-    episode.getID();
     this.episodes.push(episode);
+    this.episodeCustomIDs.push(episode.getCustomID());
 
     this._addedEpisodes = this._addedEpisodes || [];
     this._addedEpisodes.push(episode);
@@ -68,7 +66,7 @@ ChannelSchema.methods.updateEpisode = function(episode) {
         throw new TypeError("Passed episode not of type Episode");
     }
 
-    if ( ! this.containsEpisode( episode.getID() ) ) {
+    if ( ! this.containsEpisode( episode.getCustomID() ) ) {
         throw new Error("Passed episode not already in channel");
     }
 
@@ -82,7 +80,7 @@ ChannelSchema.methods.updateEpisode = function(episode) {
  * @return {Boolean}    True when this channel has that episode id
  */
 ChannelSchema.methods.containsEpisode = function(id) {
-    return this.episodes.indexOf( id ) > -1;
+    return this.episodeCustomIDs.indexOf( id ) > -1;
 };
 
 /**
@@ -127,18 +125,19 @@ ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
                     async.each(
                         channel._updatedEpisodes || [],
                         function updateEpisode(episode, next) {
-                            Episode.model.findOne( {_id : episode.getID() } )
+                            Episode.model.findOne( {customID : episode.getCustomID() } )
                                 .exec(
                                     function(err, episodeFromDB) {
                                         if (err) {
                                             return next(err);
                                         }
                                         if (!episodeFromDB) {
-                                            return next(new ReferenceError("Episode[" + episode.getID() + "] was not found in the database"));
+                                            return next(new ReferenceError("Episode[" + episode.getCustomID() + "] was not found in the database"));
                                         }
                                         assert( !channel.isNew );
 
-                                        var updatedEpisode = _.extend(episodeFromDB, episode._doc );
+                                        delete episode._doc._id;
+                                        var updatedEpisode = _.extend(episodeFromDB, episode.toObject() );
                                         updatedEpisode.save(next);
                                     }
                                 );

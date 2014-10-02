@@ -82,7 +82,7 @@ exports.episode = function(req, res) {
     var episodeID = req.params.episodeid;
 
     Episode.model.findOne({
-        oid: episodeID
+        _id: episodeID
     })
         .populate('channel')
         .exec(
