@@ -29,7 +29,7 @@ exports.index = function(req, res) {
     );
 };
 
-exports.allChannels = function(req, res) {
+exports.allContent = function(req, res) {
 
     Channel.model.find()
         .populate('episodes')

@@ -32,7 +32,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/all', routes.allChannels);
+app.get('/all', routes.allContent);
 app.get('/channel/:channelid', routes.channel);
 app.get('/channel/:channelid/episodes', routes.channelEpisodes);
 app.get('/episode/:episodeid', routes.episode);
