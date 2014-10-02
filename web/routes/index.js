@@ -1,8 +1,7 @@
 var mongoose = require('mongoose'),
     _ = require('lodash'),
     Channel = require('../../models/Channel'),
-    Episode = require('../../models/Episode'),
-    safeBase64 = require('../../models/safeBase64');
+    Episode = require('../../models/Episode');
 
 
 /*
@@ -24,8 +23,7 @@ exports.index = function(req, res) {
 
             res.render('index', {
                 title: 'It\'s podcasts',
-                episodes: episodes || [],
-                linkFunction: safeBase64.makeSafeFromString
+                episodes: episodes || []
             });
         }
     );
@@ -81,10 +79,10 @@ exports.episode = function(req, res) {
         return res.send(404, "Sorry, we couldn't find that episode");
     }
 
-    var episodeID = safeBase64.makeStringFromSafe(req.params.episodeid);
+    var episodeID = req.params.episodeid;
 
     Episode.model.findOne({
-        _id: episodeID
+        oid: episodeID
     })
         .populate('channel')
         .exec(

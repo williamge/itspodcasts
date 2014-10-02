@@ -1,11 +1,19 @@
 /** @module Channel */
 
 var mongoose = require('mongoose'),
-    _ = require('lodash'),
-    safeBase64 = require('./safeBase64');
+    _ = require('lodash');
 
 var EpisodeSchema = mongoose.Schema( {
     _id: String,
+
+    /*Is this weird??!?! Yes!
+    * _id being a string makes it easier to find the episode in the scraper going off of the Channel model through the
+    * 'episodes' array/index, for making links and generally referring/finding an Episode model an ObjectId is nicer,
+    * hence why we have a string _id and an ObjectId oid, rather than the other way around.
+    */
+    oid: {
+        type: mongoose.Schema.Types.ObjectId
+    },
     title: String,
     link: String,
     description: String,
@@ -26,6 +34,9 @@ EpisodeSchema.pre('save', function(next) {
     if (!this._id) {
         this._id = this.getID();
     }
+    if (!this.oid) {
+        this.oid = new mongoose.Types.ObjectId();
+    }
     next();
 });
 
@@ -41,7 +52,7 @@ EpisodeSchema.methods.getID = function() {
 };
 
 EpisodeSchema.virtual('URLsafeID').get(function () {
-    return safeBase64.makeSafeFromString(this.id);
+    return this.oid;
 });
 
 /**
