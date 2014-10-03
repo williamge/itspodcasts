@@ -138,7 +138,8 @@ describe( 'Channel', function() {
                 } ) ;
                 testChannel.addEpisode(testEpisode);
                 expect(testChannel).to.have.property('episodes').length(1); 
-                expect(testChannel.episodeCustomIDs.indexOf( testEpisode.getCustomID() )).to.equal(0);
+                expect(testChannel._addedEpisodes[0]).to.have.property('title').equal('title');
+                expect(testChannel._addedEpisodes[0]).to.have.property('_id').equal(testEpisode._id);
             }
         );
 

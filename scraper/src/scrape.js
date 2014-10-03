@@ -71,63 +71,72 @@ module.exports = function(Channel, Episode, options) {
                 winston.info('Channel: [' + channel.title + '] was not found in the database');
             }
 
-            var episodes = channelXML('item'),
-                seenEpisodeCount = 0;
+            channel.retrieveEpisodeCustomIDs(
+                function(err, storedEpisodes) {
+                    if (err) {
+                        return callback(err);
+                    }
 
-            episodes.each(function(i, episodeXML) {
-                var episode = new Episode.model(scrapeEpisode(episodeXML));
-                seenEpisodeCount++;
-                if (!channel.containsEpisode(episode.getCustomID())) {
-                    winston.log('debug', 'adding episode to channel');
-                    channel.addEpisode(
-                        episode
-                    );
-                } else if (options.softUpdate) {
-                    winston.log('debug', 'updating existing episode (soft-update enabled) [%s] [%s]', episode.title, channel.title);
-                    channel.updateEpisode(episode);
-                } else {
-                    winston.log('debug', 'episode already in db, not updating (soft-update not enabled) [%s] [%s]', episode.title, channel.title);
-                }
-            });
+                    var episodes = channelXML('item'),
+                        seenEpisodeCount = 0;
 
-            winston.log('info', 'saw [%d] episodes in feed', seenEpisodeCount);
+                    episodes.each(function(i, episodeXML) {
+                        var episode = new Episode.model(scrapeEpisode(episodeXML));
+                        seenEpisodeCount++;
+                        if (storedEpisodes.indexOf(episode.getCustomID()) === -1) {
+                            winston.log('debug', 'adding episode to channel');
+                            channel.addEpisode(
+                                episode
+                            );
+                        } else if (options.softUpdate) {
+                            winston.log('debug', 'updating existing episode (soft-update enabled) [%s] [%s]', episode.title, channel.title);
+                            channel.updateEpisode(episode);
+                        } else {
+                            winston.log('debug', 'episode already in db, not updating (soft-update not enabled) [%s] [%s]', episode.title, channel.title);
+                        }
+                    });
 
-            if (channelXML('image').length === 0) {
-                return callback(null, channel);
-            } else {
-                var imageURL = channelXML('image > url').text();
+                    winston.log('info', 'saw [%d] episodes in feed', seenEpisodeCount);
 
-                var lastImage = channel.getLastImage();
+                    if (channelXML('image').length === 0) {
+                        return callback(null, channel);
+                    } else {
+                        var imageURL = channelXML('image > url').text();
 
-                if (!options.softUpdate && lastImage && lastImage.originalURL === imageURL) {
-                    winston.info("Not updating image for channel [" + channel.title + "], already at the latest (soft update is off)");
-                    return callback(null, channel);
-                } else {
-                    requestImage(imageURL,
-                        function(err, imageResponse) {
-                            if (err) {
-                                winston.error("Error scraping image at URL [" + imageURL + "], channel [" + channel.title + "]: " + err.toString());
-                                return callback(null, channel);
-                            }
+                        var lastImage = channel.getLastImage();
 
-                            var scrapedImage = new PImage.model({
-                                originalURL: imageURL
-                            });
-
-                            scrapedImage.saveImage(imageResponse,
-                                function(err, savedImage) {
+                        if (!options.softUpdate && lastImage && lastImage.originalURL === imageURL) {
+                            winston.info("Not updating image for channel [" + channel.title + "], already at the latest (soft update is off)");
+                            return callback(null, channel);
+                        } else {
+                            requestImage(imageURL,
+                                function(err, imageResponse) {
                                     if (err) {
-                                        winston.error("Error saving image [" + imageURL + "] for channel [" + channel.title + "]: " + err);
+                                        winston.error("Error scraping image at URL [" + imageURL + "], channel [" + channel.title + "]: " + err.toString());
                                         return callback(null, channel);
                                     }
-                                    winston.info("Saved image for channel [" + channel.title + "] (soft update: " + options.softUpdate + ")");
-                                    channel.images.push(savedImage);
-                                    return callback(null, channel);
-                                });
+
+                                    var scrapedImage = new PImage.model({
+                                        originalURL: imageURL
+                                    });
+
+                                    scrapedImage.saveImage(imageResponse,
+                                        function(err, savedImage) {
+                                            if (err) {
+                                                winston.error("Error saving image [" + imageURL + "] for channel [" + channel.title + "]: " + err);
+                                                return callback(null, channel);
+                                            }
+                                            winston.info("Saved image for channel [" + channel.title + "] (soft update: " + options.softUpdate + ")");
+                                            channel.images.push(savedImage);
+                                            return callback(null, channel);
+                                        }
+                                    );
+                                }
+                            );
                         }
-                    );
+                    }
                 }
-            }
+            );
         });
     }
 

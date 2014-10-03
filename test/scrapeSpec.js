@@ -64,10 +64,11 @@ describe('scrape', function() {
         it( 'should update the Channel and Episodes if the update option is set', function(done) {
             scrape.scrapeChannel( testXML.feed, function(err, channel) {
                 expect(channel).to.have.property("title").equal("test channel title");
-                channel.save(function(err) {
+                channel.saveChannelAndEpisodes(function(err) {
                     if (err) throw err;
 
                     scrapePackage(Channel, Episode, {softUpdate: true}).scrapeChannel(updatedXMLChannel, function(err, channel) {
+                        expect(channel._updatedEpisodes).to.have.property('length').equal(2);
                         var updatedEpisodeDescriptions = _.map(channel.getUpdatedEpisodes(), 'description');
                         expect(updatedEpisodeDescriptions).to.contain("test episode description 1 updated");
                         done();

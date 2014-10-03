@@ -11,9 +11,28 @@ var Episode = require('./Episode'),
 var ChannelSchema = mongoose.Schema( {
     title: { type: String, required: true },
     episodes: [ { type: String, ref: 'Episode' } ],
-    episodeCustomIDs: [String],
     images: [PImage.schema]
 });
+
+ChannelSchema.methods.retrieveEpisodeCustomIDs = function(callback) {
+    Episode.model
+        .find({
+            channel: this._id
+        })
+        .exec(
+            function(err, storedEpisodes) {
+                if (err) {
+                    return callback(err);
+                }
+
+                var storedCustomIDs = _.map(storedEpisodes,
+                    function (episode) {
+                        return episode.customID;
+                    });
+                return callback(null, storedCustomIDs);
+            }
+        );
+};
 
 /**
  * Returns a unique identifier for the current Channel
@@ -50,8 +69,7 @@ ChannelSchema.methods.addEpisode = function(episode) {
         throw new TypeError("Passed episode not of type Episode");
     }
 
-    this.episodes.push(episode);
-    this.episodeCustomIDs.push(episode.getCustomID());
+    this.episodes.push(episode._id);
 
     this._addedEpisodes = this._addedEpisodes || [];
     this._addedEpisodes.push(episode);
@@ -66,21 +84,8 @@ ChannelSchema.methods.updateEpisode = function(episode) {
         throw new TypeError("Passed episode not of type Episode");
     }
 
-    if ( ! this.containsEpisode( episode.getCustomID() ) ) {
-        throw new Error("Passed episode not already in channel");
-    }
-
     this._updatedEpisodes = this._updatedEpisodes || [];
     this._updatedEpisodes.push(episode);
-};
-
-/**
- * Returns whether this channel has an episode with the given id
- * @param  {String} id id to look up an episode in this channel
- * @return {Boolean}    True when this channel has that episode id
- */
-ChannelSchema.methods.containsEpisode = function(id) {
-    return this.episodeCustomIDs.indexOf( id ) > -1;
 };
 
 /**

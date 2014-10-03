@@ -5,12 +5,7 @@ var mongoose = require('mongoose'),
 
 var EpisodeSchema = mongoose.Schema( {
 
-    /*Is this weird??!?! Yes!
-    * _id being a string makes it easier to find the episode in the scraper going off of the Channel model through the
-    * 'episodes' array/index, for making links and generally referring/finding an Episode model an ObjectId is nicer,
-    * hence why we have a string _id and an ObjectId oid, rather than the other way around.
-    */
-    customID: String,
+    customID: { type: String, index: true },
     title: String,
     link: String,
     description: String,
