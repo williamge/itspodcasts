@@ -194,7 +194,7 @@ describe( 'Channel', function() {
                 async.series(
                     [
                         function(next) {
-                            testChannel.saveChannelAndEpisodes(next);
+                            testChannel.save(next);
                         },                       
                         function(next) {
                             testChannel.updateEpisode( new Episode.model( {
@@ -206,7 +206,7 @@ describe( 'Channel', function() {
                             next();
                         },
                         function(next) {
-                            testChannel.saveChannelAndEpisodes(next);
+                            testChannel.save(next);
                         },
                         function(next) {
                             Episode.model.findOne( {title: 'title'}, 

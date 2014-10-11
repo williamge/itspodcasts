@@ -173,9 +173,9 @@ describe( 'Episode', function() {
                     } ) );
                 } );
 
-                getEpisodesTestChannel1.saveChannelAndEpisodes( function(err) {
+                getEpisodesTestChannel1.save( function(err) {
                     if (err) done(err);
-                    getEpisodesTestChannel2.saveChannelAndEpisodes(done);
+                    getEpisodesTestChannel2.save(done);
                 });
 
             });

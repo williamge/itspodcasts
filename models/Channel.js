@@ -14,6 +14,66 @@ var ChannelSchema = mongoose.Schema( {
     images: [PImage.schema]
 });
 
+ChannelSchema.pre('save', function (nextMiddleware) {
+    //This would be a nice place to use a bulk insert operation, mongoose doesn't have that though
+
+    function channelDetails(channel) {
+        return {
+            channel: channel._id,
+            channelTitle: channel.title
+        };
+    }
+
+    var selfChannel = this;
+
+    return async.parallel(
+        [
+            function saveAddedEpisodes(done) {
+                async.each(
+                        selfChannel._addedEpisodes || [],
+                    function saveEpisode(episode, next) {
+                        _.extend(episode, channelDetails(selfChannel));
+
+                        episode.save(next);
+                    },
+                    function doneSaving(err) {
+                        done(err);
+                    }
+                );
+            },
+            function saveUpdatedEpisodes(done) {
+                async.each(
+                        selfChannel._updatedEpisodes || [],
+                    function updateEpisode(episode, next) {
+                        Episode.model.findOne({customID: episode.getCustomID() })
+                            .exec(
+                            function (err, episodeFromDB) {
+                                if (err) {
+                                    return next(err);
+                                }
+                                if (!episodeFromDB) {
+                                    return next(new ReferenceError("Episode[" + episode.getCustomID() + "] was not found in the database"));
+                                }
+                                assert(!selfChannel.isNew);
+
+                                delete episode._doc._id;
+                                var updatedEpisode = _.extend(episodeFromDB, episode.toObject());
+                                updatedEpisode.save(next);
+                            }
+                        );
+                    },
+                    function doneUpdating(err) {
+                        done(err);
+                    }
+                );
+            }
+        ],
+        function done(err) {
+            nextMiddleware(err);
+        }
+    );
+});
+
 ChannelSchema.methods.retrieveEpisodeCustomIDs = function(callback) {
     Episode.model
         .find({
@@ -86,78 +146,6 @@ ChannelSchema.methods.updateEpisode = function(episode) {
 
     this._updatedEpisodes = this._updatedEpisodes || [];
     this._updatedEpisodes.push(episode);
-};
-
-/**
- * Saves the channel and it's episodes (added and updated) to the database.
- * @param  {Function} callback callback to be called on error or when the channel and episodes have been saved
- */
-ChannelSchema.methods.saveChannelAndEpisodes = function(callback) {
-    
-    //This would be a nice place to use a bulk insert operation, mongoose doesn't have that though
-
-    function channelDetails(channel) {
-        return {
-            channel: channel._id,
-            channelTitle: channel.title
-        };
-    }
-
-    var channel = this;
-
-    this.save(function(err, savedChannel) {
-
-        if (err) {
-            return callback(err);
-        }
-
-        async.parallel(
-            [
-                function saveAddedEpisodes(done) {
-                    async.each(
-                        channel._addedEpisodes || [],
-                        function saveEpisode(episode, next) {
-                            _.extend( episode, channelDetails(savedChannel) );
-
-                            episode.save(next);
-                        },
-                        function doneSaving(err) {
-                            done(err);
-                        }
-                    );
-                },
-                function saveUpdatedEpisodes(done) {
-                    async.each(
-                        channel._updatedEpisodes || [],
-                        function updateEpisode(episode, next) {
-                            Episode.model.findOne( {customID : episode.getCustomID() } )
-                                .exec(
-                                    function(err, episodeFromDB) {
-                                        if (err) {
-                                            return next(err);
-                                        }
-                                        if (!episodeFromDB) {
-                                            return next(new ReferenceError("Episode[" + episode.getCustomID() + "] was not found in the database"));
-                                        }
-                                        assert( !channel.isNew );
-
-                                        delete episode._doc._id;
-                                        var updatedEpisode = _.extend(episodeFromDB, episode.toObject() );
-                                        updatedEpisode.save(next);
-                                    }
-                                );
-                        },
-                        function doneUpdating(err) {
-                            done(err);
-                        }
-                    );
-                }
-            ],
-            function done(err) {
-                callback(err);
-            }
-        );
-    });
 };
 
 ChannelSchema.methods.getLastImage = function() {
