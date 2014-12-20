@@ -34,7 +34,8 @@ var loadXMLSync = function(path) {
 var testXML = {
     feed: loadXMLSync(__dirname + '/data/Feed.xml').toString(),
     episode: loadXMLSync(__dirname + '/data/episode.xml').toString(),
-    channel: loadXMLSync(__dirname + '/data/channel.xml').toString()
+    channel: loadXMLSync(__dirname + '/data/channel.xml').toString(),
+    feedNoImage: loadXMLSync(__dirname + '/data/feedNoImage.xml').toString()
 };
 
 

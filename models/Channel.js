@@ -10,8 +10,15 @@ var Episode = require('./Episode'),
 
 var ChannelSchema = mongoose.Schema( {
     title: { type: String, required: true },
+    /* TODO: rename this to episodeRefs or something along those lines, these aren't
+     * really episodes, just a reference to their index */
     episodes: [ { type: String, ref: 'Episode' } ],
     images: [PImage.schema]
+});
+
+ChannelSchema.post('init', function (doc) {
+        doc._updatedEpisodes = doc._updatedEpisodes || [];
+        doc._addedEpisodes = doc._addedEpisodes || [];
 });
 
 ChannelSchema.pre('save', function (nextMiddleware) {
