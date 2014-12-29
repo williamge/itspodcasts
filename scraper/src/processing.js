@@ -7,7 +7,8 @@ var fs = require('fs'),
     winston = require('winston');
 
 var Channel = require('../../models/Channel'),
-    Episode = require('../../models/Episode');
+    Episode = require('../../models/Episode'),
+    Scraper = require('./Scraper');
 
 module.exports = function(options) {
     options = options || {};
@@ -108,15 +109,11 @@ module.exports = function(options) {
      * @param  {doneCallback} callback        callback to be run after all channelFunction instances have finished running
      */
     function scrapeXML(data, channelFunction, callback) {
-        scrape.scrapeSource(data,
-            function(err, channelList) {
-                async.each(
-                    channelList,
-                    channelFunction,
-                    callback
-                );
-            }
-        );
+        var scraper = new Scraper(options);
+        scraper.run(data, function(err, result) {
+            scraper = result;
+            channelFunction(scraper.channel, callback);
+        });
     }
 
     /**
