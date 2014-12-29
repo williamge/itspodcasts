@@ -3,3 +3,4 @@ temp
 *.sublime-project
 *.sublime-workspace
 .idea
+coverage

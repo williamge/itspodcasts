@@ -14,6 +14,7 @@
     "scripts": {
         "test": "mocha test",
         "test.cov": "mocha -r jscoverage --covout=html --covinject=true test",
+        "test.cov.istanbul": "istanbul cover _mocha -- -R spec",
         "scraper": "node scraper/index.js",
         "web": "node web/app.js"
     },
