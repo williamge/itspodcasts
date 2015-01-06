@@ -11,7 +11,8 @@ var Channel = require('../models/Channel'),
     Episode = require('../models/Episode'),
     Scraper = require('../scraper/src/Scraper.js');
 
-var testXMLs = testHelpers.testXML;
+var testXMLs = testHelpers.testXML,
+    scraper;
 
 beforeEach(function(done) {
     mongoose.connection.db.dropDatabase(done);

@@ -158,10 +158,66 @@ Scraper.prototype.scrapeChannel = function(channelXML, callback) {
 
                 //this makes no sense, use pimage in channel
                 self.channelImageURL = Scraper.scrapeImageURL($channel);
-                callback();
 
+                self.scrapeImage(
+                    function doneScrapingImage() {
+                        return callback(null, self);
+                    }
+                );
             });
     });
 };
+
+Scraper.prototype.scrapeImage = function(callback) {
+    var self = this;
+
+    var lastImage = self.channel.getLastImage();
+    if (!self.options.softUpdate && lastImage && lastImage.originalURL === self.channelImageURL) {
+        winston.info("Not updating image for channel [" + self.channel.title + "], already at the latest (soft update is off)");
+        return callback(null, self);
+    } else {
+
+        //TODO: put this as a static method for PImage
+        requestImage(self.channelImageURL,
+            function(err, imageResponse) {
+                if (err) {
+                    winston.error("Error scraping image at URL [" + self.channelImageURL + "], channel [" + self.channel.title + "]: " + err.toString());
+                    return callback(err, self);
+                }
+
+                var scrapedImage = new PImage.model({
+                    originalURL: self.channelImageURL
+                });
+
+                scrapedImage.imageBuffer = imageResponse;
+
+                self.channel.addImage(scrapedImage);
+
+                return callback(null, self);
+
+            }
+        );
+    }
+};
+
+function requestImage(url, callback) {
+    request.get(url, {
+            encoding: null
+        },
+        function(err, response, body) {
+            if (err) {
+                return callback(err);
+            }
+            switch (response.statusCode) {
+                case 200:
+                    var grid = new mongodb.Grid(mongoose.connection.db, 'channel_images');
+                    return callback(err, body);
+                default:
+                    return callback(err);
+            }
+        }
+    );
+}
+
 
 module.exports = Scraper;

@@ -16,10 +16,14 @@ var ChannelSchema = mongoose.Schema( {
     images: [PImage.schema]
 });
 
-ChannelSchema.post('init', function (doc) {
-        doc._updatedEpisodes = doc._updatedEpisodes || [];
-        doc._addedEpisodes = doc._addedEpisodes || [];
+ChannelSchema.virtual('updatedEpisodes').get(function() {
+    return this._updatedEpisodes || [];
 });
+
+ChannelSchema.virtual('addedEpisodes').get(function() {
+    return this._addedEpisodes || [];
+});
+
 
 ChannelSchema.pre('save', function (nextMiddleware) {
     //This would be a nice place to use a bulk insert operation, mongoose doesn't have that though
@@ -37,7 +41,7 @@ ChannelSchema.pre('save', function (nextMiddleware) {
         [
             function saveAddedEpisodes(done) {
                 async.each(
-                        selfChannel._addedEpisodes || [],
+                    selfChannel._addedEpisodes || [],
                     function saveEpisode(episode, next) {
                         _.extend(episode, channelDetails(selfChannel));
 
@@ -50,7 +54,7 @@ ChannelSchema.pre('save', function (nextMiddleware) {
             },
             function saveUpdatedEpisodes(done) {
                 async.each(
-                        selfChannel._updatedEpisodes || [],
+                    selfChannel._updatedEpisodes || [],
                     function updateEpisode(episode, next) {
                         Episode.model.findOne({customID: episode.getCustomID() })
                             .exec(
@@ -73,6 +77,18 @@ ChannelSchema.pre('save', function (nextMiddleware) {
                         done(err);
                     }
                 );
+            },
+            function saveUnsavedImages(done){
+                    async.each(
+                        selfChannel.unsavedImages || [],
+                        function saveImage(image, next) {
+                            selfChannel.saveImage(image, next);
+                        },
+                        function doneSavingImages(err) {
+                            done(err);
+                        }
+                    );
+
             }
         ],
         function done(err) {
@@ -161,6 +177,63 @@ ChannelSchema.methods.getLastImage = function() {
     } else {
         return null;
     }
+};
+
+ChannelSchema.methods.addImage = function(pimage) {
+    var self = this;
+    self.images.push(pimage);
+    self.images[[self.images.length-1]].saved = false;
+    self.unsavedImages = self.unsavedImages || [];
+    //Note: when the PImage instance is added to self.images, since self.images is an array
+    //handled by mongoose, non-schema properties will be dropped apparently, such as one we are
+    //relying on later called 'imageBuffer', hence we need to add the original pimage argument
+    //to unsavedImages to ensure we have access to imageBuffer later.
+    //
+    //I wish mongoose had better support for GridFS to make this a lot cleaner but unfortunately it doesn't.
+    self.unsavedImages.push(pimage);
+};
+
+ChannelSchema.methods.saveImage = function(image, callback) {
+    var self = this;
+
+    var original_imageID = image._id;
+
+    image.saveImage(image.imageBuffer,
+        function imageSaved (err, savedImage) {
+            if (err) {
+                return callback(null, self);
+            }
+
+
+            var matchingUnsavedImages = _.filter(self.unsavedImages, function(filter_image) {
+                return filter_image.originalURL === image.originalURL;
+            });
+
+            if (matchingUnsavedImages.length === 0) {
+                self.images.push(savedImage);
+            } else {
+                self.unsavedImages = _.filter(self.unsavedImages,
+                    function filterImage(filter_image) {
+                        return filter_image.originalURL !== image.originalURL;
+                    });
+
+                //TODO: clear up the below process, it seems fishy to do so much work because something was changing inside a function
+
+                //If the image was already added to the 'channel.images' array then
+                //it's _id will be different from what it should be, if so then we
+                //just update that image to be the one we saved, which will have a new id
+                self.images = _.map(self.images, function(imageFromImages) {
+                    if (imageFromImages._id || imageFromImages === original_imageID) {
+                        return savedImage;
+                    } else {
+                        return imageFromImages;
+                    }
+                });
+            }
+
+            return callback(null, self);
+        }
+    );
 };
 
 var Channel = mongoose.model('Channel', ChannelSchema);

@@ -9,6 +9,14 @@ var PImageSchema = mongoose.Schema( {
     originalURL: { type: String }
 });
 
+PImageSchema.virtual('imageBuffer').set(function (buffer) {
+    this._imageBuffer = buffer;
+});
+
+PImageSchema.virtual('imageBuffer').get(function () {
+    return this._imageBuffer;
+});
+
 PImageSchema.methods.saveImage = function(image, callback) {
     var this_pimage = this;
     var grid = new mongoose.mongo.Grid(mongoose.connection.db, 'channel_images');
