@@ -12,7 +12,6 @@ var Channel = require('../../models/Channel'),
 
 module.exports = function(options) {
     options = options || {};
-    var scrape = require('./scrape')(Channel, Episode, options);
 
     /**
      * Saves a {Channel} object and calls the 'done' callback when the Channel object has been saved or there has

@@ -22,11 +22,12 @@ var defaultOptions = {
 };
 
 function castAsCheerioXML(xml) {
-    /* #root() is a function in cheerio objects that is unlikely to be a property on
-     * other types, such as strings or buffers.
-     */
+
     if (!xml) {
         throw new Error("Given xml was null or undefined");
+        /* #root() is a function in cheerio objects that is unlikely to be a property on
+         * other types, such as strings or buffers.
+         */
     } else if (xml.root) {
         return xml;
     } else {
