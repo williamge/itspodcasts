@@ -112,7 +112,7 @@ describe('Scraper (whole testing)', function() {
             } );
         });
 
-        it( 'should update the Channel and Episodes if the update option is set', function(done) {
+        it( 'should not update the Channel and Episodes if the update option is not set', function(done) {
             scraper = new Scraper({softUpdate: false});
             scraper.run( testXMLs.feed, function(err, result) {
                 expect(result.channel).to.have.property("title").equal("test channel title");
@@ -120,7 +120,7 @@ describe('Scraper (whole testing)', function() {
                     if (err) throw err;
 
                     scraper.run(updatedXMLChannel, function(err, result) {
-                        expect(result.channel._updatedEpisodes).to.have.property('length').equal(0);
+                        expect(result.channel._updatedEpisodes || []).to.have.property('length').equal(0);
                         var updatedEpisodeDescriptions = _.map(result.channel.getUpdatedEpisodes(), 'description');
                         expect(updatedEpisodeDescriptions).to.not.contain("test episode description 1 updated");
                         done();
