@@ -160,11 +160,16 @@ Scraper.prototype.scrapeChannel = function(channelXML, callback) {
                 //this makes no sense, use pimage in channel
                 self.channelImageURL = Scraper.scrapeImageURL($channel);
 
-                self.scrapeImage(
-                    function doneScrapingImage() {
-                        return callback(null, self);
-                    }
-                );
+                if (!self.channelImageURL) {
+                    return callback(null, self);
+                } else {
+                    self.scrapeImage(
+                        function doneScrapingImage() {
+                            return callback(null, self);
+                        }
+                    );
+                }
+
             });
     });
 };
