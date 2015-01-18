@@ -115,20 +115,7 @@ module.exports = function(options) {
         });
     }
 
-    /**
-     * Function that controls actual operation of scraping, handling errors and delegating scraping tasks.
-     * @param  {Error}   err      Error that has been encountered, if any
-     * @param  {string}   data     XML data in a string to be scraped
-     * @param  {doneCallback} callback callback to be called after scraping is complete
-     */
-    function scrapeController(err, data, callback) {
-        if (err) {
-            winston.error(err);
-            callback(err);
-        } else {
-            scrapeXML(data, saveChannel, callback);
-        }
-    }
+
 
     /**
      * Retrieves the given sources and runs #scrapeXML() on each one, finally calling
@@ -149,6 +136,22 @@ module.exports = function(options) {
                     source: source.source,
                     type: source.type
                 });
+
+                /**
+                 * Function that controls actual operation of scraping, handling errors and delegating scraping tasks.
+                 * @param  {Error}   err      Error that has been encountered, if any
+                 * @param  {string}   data     XML data in a string to be scraped
+                 * @param  {doneCallback} callback callback to be called after scraping is complete
+                 */
+                function scrapeController(err, data, callback) {
+                    if (err) {
+                        winston.error("Could not scrape source: " + source.source + ". Reason: " + err.message);
+                        callback();
+                    } else {
+                        scrapeXML(data, saveChannel, callback);
+                    }
+                }
+
                 switch (source.type) {
                     case "file":
                         readXMLFile(source.source, scrapeController, done);
