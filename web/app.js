@@ -39,6 +39,8 @@ app.get('/channel/:channelid/episodes', routes.channelEpisodes);
 app.get('/episode/:episodeid', routes.episode);
 app.get('/channel_images/:image_id', routes.images.channel_images);
 
+app.get('/json/episodes/recent', routes.recentEpisodes);
+
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
 

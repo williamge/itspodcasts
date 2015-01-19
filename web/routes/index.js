@@ -29,6 +29,23 @@ exports.index = function(req, res) {
     );
 };
 
+exports.recentEpisodes = function(req, res) {
+    Episode.model.getEpisodes({
+        sort: {
+            pubDate: -1
+        }
+    }).populate('channel').exec(
+        function(err, episodes) {
+            if (err) {
+                console.error("recent episodes page Channel#getEpisodes error: " +
+                    err);
+            }
+
+            res.json(episodes);
+        }
+    );
+};
+
 exports.allContent = function(req, res) {
 
     Channel.model.find()
