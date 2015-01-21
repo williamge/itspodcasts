@@ -3,8 +3,10 @@
  */
 
 var express = require('express');
+
 var routes = require('./routes');
 routes.images = require('./routes/images');
+
 var config = require('./config');
 
 var http = require('http');
@@ -30,6 +32,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
     app.use(express.errorHandler());
 }
+
+app.get('/templates/:template',
+    function(req, res) {
+        var templateName = req.params.template.replace(".html", "");
+        return res.render('directives/' + templateName);
+    }
+);
 
 app.get('/', routes.index);
 app.get('/all', routes.allContent);
