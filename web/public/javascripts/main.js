@@ -1,84 +1,110 @@
 angular.module("main", [])
-    .controller("episodeList", function($scope, $http) {
+    .factory("filtersService", [
 
-        $scope.episodes = [];
+        function() {
+            var self = {};
 
-        $scope.episodesFilter = function(input) {
-            var output = true;
-            var filters = $scope.episodesFilter.filters;
-            for (var filter in filters) {
-                if (filters.hasOwnProperty(filter)) {
-                    output = filters[filter](input) && output;
+            var currentFilters = {};
+
+            self.episodesFilter = function(episode) {
+                var output = true;
+                var filters = currentFilters;
+                for (var filter in filters) {
+                    if (filters.hasOwnProperty(filter)) {
+                        output = filters[filter](episode) && output;
+                    }
                 }
-            }
-            return output;
-        };
-
-        $scope.episodesFilter.filters = {};
-
-        $scope.filtersApplied = function() {
-            return Object.keys($scope.episodesFilter.filters).length > 0;
-        };
-
-
-        $scope.formatDate = function(date) {
-            return new Date(date).toUTCString() || "No date";
-        };
-
-        $scope.truncateLink = function(text, maxLength) {
-            if (text.length > maxLength) {
-                var slicePoint = (maxLength - 5) / 2;
-                return text.slice(0, slicePoint) + " ... " + text.slice(-slicePoint);
-            } else {
-                return text;
-            }
-        };
-
-        $scope.filterByChannel = function(channelTitle) {
-            $scope.filterByDate.name = 'filterByChannel';
-            return function _filter(episode) {
-                _filter.name = 'filterByChannel';
-
-                return episode.channel.title === channelTitle;
+                return output;
             };
-        };
 
-        $scope.filterByDate = function(date) {
-            $scope.filterByDate.name = 'filterByDate';
-            return function _filter(episode) {
+            self.filters = {};
 
-                var pubDate = new Date(episode.pubDate);
-                var filterDate = new Date(date);
+            self.filters.filterByChannel = function(channelTitle) {
+                return {
+                    name: 'filterByChannel',
+                    filter: function _filter(episode) {
 
-                return pubDate.toDateString() === filterDate.toDateString();
+                        return episode.channel.title === channelTitle;
+                    }
+
+                };
             };
-        };
 
-        $scope.setFilter = function(thing, filter) {
-            $scope.episodesFilter.filters[filter.name] = filter(thing);
-        };
+            self.filters.filterByDate = function(date) {
+                return {
+                    name: 'filterByDate',
+                    filter: function _filter(episode) {
 
-        $scope.removeFilter = function(filter) {
-            if (filter) {
-                delete $scope.episodesFilter.filters[filter.name];
-            } else {
-                $scope.episodesFilter.filters = {};
-            }
+                        var pubDate = new Date(episode.pubDate);
+                        var filterDate = new Date(date);
 
-        };
+                        return pubDate.toDateString() === filterDate.toDateString();
+                    }
+                };
+            };
 
-        $scope.getChannelImageURL = function(channel) {
-            if (channel.images[0]._id) {
-                return '/channel_images/' + channel.images[0]._id + '.jpg';
-            } else {
-                return null;
-            }
-        };
+            self.addFilter = function(input, filter) {
+                var filterInfo = filter(input);
+                currentFilters[filterInfo.name] = filterInfo.filter;
+            };
 
-        $http.get(
-            '/json/episodes/recent'
-        ).success(function(data) {
-            $scope.episodes = data;
-        });
+            self.removeFilter = function(filter) {
+                var filterInfo = filter();
+                if (filter) {
+                    delete currentFilters.episodesFilter.filters[filterInfo.name];
+                } else {
+                    currentFilters.episodesFilter.filters = {};
+                }
+            };
 
-    });
+            return self;
+        }
+    ])
+    .controller("episodeList", ['$scope', '$http', 'filtersService',
+        function($scope, $http, filters) {
+
+            $scope.episodes = [];
+
+            $scope.episodesFilter = filters.episodesFilter;
+
+            $scope.filtersApplied = function() {
+                return true; //Object.keys($scope.episodesFilter.filters).length > 0;
+            };
+
+            $scope.formatDate = function(date) {
+                return new Date(date).toUTCString() || "No date";
+            };
+
+            $scope.truncateLink = function(text, maxLength) {
+                if (text.length > maxLength) {
+                    var slicePoint = (maxLength - 5) / 2;
+                    return text.slice(0, slicePoint) + " ... " + text.slice(-slicePoint);
+                } else {
+                    return text;
+                }
+            };
+
+            $scope.filterByChannel = filters.filters.filterByChannel;
+
+            $scope.filterByDate = filters.filters.filterByDate;
+
+            $scope.setFilter = filters.addFilter;
+
+            $scope.removeFilter = filters.removeFilter;
+
+            $scope.getChannelImageURL = function(channel) {
+                if (channel.images[0]._id) {
+                    return '/channel_images/' + channel.images[0]._id + '.jpg';
+                } else {
+                    return null;
+                }
+            };
+
+            $http.get(
+                '/json/episodes/recent'
+            ).success(function(data) {
+                $scope.episodes = data;
+            });
+
+        }
+    ]);
