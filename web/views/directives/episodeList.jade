@@ -1,0 +1,13 @@
+ul.episodes-list
+   li.episode-container(ng-repeat='episode in ctrl.episodes | filter:ctrl.episodesFilter')
+      .channel-image(class='small', ng-show='ctrl.getChannelImageURL(episode.channel)')
+         img(ng-src='{{ctrl.getChannelImageURL(episode.channel) || ""}}')
+      h3
+         a.link(href='/episode/{{episode._id}}') {{episode.title}}
+      h4.channel-title
+         a.channel-link(href='/channel/{{episode.channel._id}}') {{episode.channel.title}}
+      a.filter-link(ng-click='ctrl.setFilter(episode.channel.title, ctrl.filterByChannel)') Just this channel
+      p.date {{ctrl.formatDate(episode.pubDate)}}
+         a.filter-link(ng-click='ctrl.setFilter(episode.pubDate, ctrl.filterByDate)') Just this day
+      a.link(href='{{episode.link}}') {{ctrl.truncateLink(episode.link, 75)}}
+      p.description  {{episode.description}}
