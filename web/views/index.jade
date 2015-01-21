@@ -9,20 +9,18 @@ block content
     script(src='/javascripts/main.js', type='text/javascript')
 
     ul.episodes-list(ng-app="main", ng-controller="episodeList")
-        li.episode-container(ng-repeat='episode in episodes')
-            .channel-image(class='small', ng-show='episode.channel.images.length')
-                img(src='/channel_images/{{episode.channel.images[0]._id}}.jpg')
+        a.btn(ng-click="removeFilter()", ng-show='filtersApplied()') Remove filters
+        li.episode-container(ng-repeat='episode in episodes | filter:episodesFilter')
+            .channel-image(class='small', ng-show='getChannelImageURL(episode.channel)')
+                img(ng-src='{{getChannelImageURL(episode.channel) || ""}}')
             h3
-                a.link(href='/episode/{{episode._id}}')
-                    {{episode.title}}
+                a.link(href='/episode/{{episode._id}}') {{episode.title}}
             h4.channel-title
-                a.channel-link(href='/channel/{{episode.channel._id}}')
-                    {{episode.channel.title}}
-            p.date
-                {{formatDate(episode.pubDate)}}
-            a.link(href='{{episode.link}}')
-                {{truncateLink(episode.link, 75)}}
-            p.description
-                {{episode.description}}
+                a.channel-link(href='/channel/{{episode.channel._id}}') {{episode.channel.title}}
+            a.filter-link(ng-click='setFilter(episode.channel.title, filterByChannel)') Just this channel
+            p.date {{formatDate(episode.pubDate)}}
+                a.filter-link(ng-click='setFilter(episode.pubDate, filterByDate)') Just this day
+            a.link(href='{{episode.link}}') {{truncateLink(episode.link, 75)}}
+            p.description  {{episode.description}}
 
 

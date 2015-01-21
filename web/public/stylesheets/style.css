@@ -44,10 +44,25 @@ li.episode-container:hover {
     text-decoration: underline;
 }
 
+.filter-link {
+    font-size: 0.6rem;
+    padding: 1.5em;
+    text-decoration: none;
+}
+
+.filter-link:hover {
+    text-decoration: underline;
+}
+
 .link {
     font-style: italic;
     font-size: 0.9em;
     display: block;
+}
+
+.btn {
+    background: #eee;
+    padding: 0.5em;
 }
 
 .see-more {
@@ -58,7 +73,7 @@ li.episode-container:hover {
     text-align: center;
 }
 
-.header {
+.header, .main-container {
     max-width: 940px;
     margin-left: auto;
     margin-right: auto;
