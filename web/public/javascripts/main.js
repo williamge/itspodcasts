@@ -51,10 +51,18 @@ angular.module("main", [])
             self.removeFilter = function(filter) {
                 var filterInfo = filter();
                 if (filter) {
-                    delete currentFilters.episodesFilter.filters[filterInfo.name];
+                    delete currentFilters[filterInfo.name];
                 } else {
-                    currentFilters.episodesFilter.filters = {};
+                    currentFilters = {};
                 }
+            };
+
+            self.clearFilters = function() {
+                currentFilters = {};
+            };
+
+            self.filtersApplied = function() {
+                return Object.keys(currentFilters).length > 0;
             };
 
             return self;
@@ -66,10 +74,6 @@ angular.module("main", [])
             $scope.episodes = [];
 
             $scope.episodesFilter = filters.episodesFilter;
-
-            $scope.filtersApplied = function() {
-                return true; //Object.keys($scope.episodesFilter.filters).length > 0;
-            };
 
             $scope.formatDate = function(date) {
                 return new Date(date).toUTCString() || "No date";
@@ -90,8 +94,6 @@ angular.module("main", [])
 
             $scope.setFilter = filters.addFilter;
 
-            $scope.removeFilter = filters.removeFilter;
-
             $scope.getChannelImageURL = function(channel) {
                 if (channel.images[0]._id) {
                     return '/channel_images/' + channel.images[0]._id + '.jpg';
@@ -106,5 +108,12 @@ angular.module("main", [])
                 $scope.episodes = data;
             });
 
+        }
+    ])
+    .controller('appliedFilters', ['$scope', 'filtersService',
+        function($scope, filters) {
+            $scope.clearFilters = filters.clearFilters;
+
+            $scope.filtersApplied = filters.filtersApplied;
         }
     ]);
