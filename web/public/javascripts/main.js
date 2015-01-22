@@ -79,6 +79,15 @@ angular.module("main", [])
             return self;
         }
     ])
+    .directive('episodeList', function() {
+        return {
+            templateUrl: 'templates/episodeList.html',
+            replace: true,
+            scope: true,
+            controller: 'episodeListCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
     .controller("episodeListCtrl", ['$http', 'filtersService',
         function($http, filters) {
 
@@ -123,24 +132,28 @@ angular.module("main", [])
 
         }
     ])
-    .controller('appliedFilters', ['$scope', 'filtersService',
-        function($scope, filters) {
-            $scope.clearFilters = filters.clearFilters;
+    .directive('appliedFilters', function() {
+        return {
+            templateUrl: 'templates/appliedFilters.html',
+            replace: true,
+            scope: true,
+            controller: 'appliedFiltersCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
+    .controller('appliedFiltersCtrl', ['filtersService',
+        function(filters) {
 
-            $scope.filtersApplied = filters.filtersApplied;
+            var self = this;
 
-            $scope.filters = filters;
+            self.clearFilters = filters.clearFilters;
 
-            $scope.removeFilter = function(filter) {
+            self.filtersApplied = filters.filtersApplied;
+
+            self.filters = filters;
+
+            self.removeFilter = function(filter) {
                 filters.removeFilter(filter.name);
             };
         }
-    ])
-    .directive('episodeList', function() {
-        return {
-            templateUrl: 'templates/episodeList.html',
-            replace: true,
-            controller: 'episodeListCtrl',
-            controllerAs: 'ctrl'
-        };
-    });
+    ]);

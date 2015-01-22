@@ -1,0 +1,8 @@
+.applied-filters
+    a.btn(ng-click='ctrl.clearFilters()', ng-show='ctrl.filtersApplied()') Remove all filters
+    ul
+        li.btn(ng-repeat='filter in ctrl.filters.currentFilters()')
+            a {{filter.description}}
+            a.btn(
+               ng-click='ctrl.removeFilter(this.filter)'
+            ) x

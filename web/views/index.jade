@@ -6,13 +6,6 @@ block content
     script(src='/javascripts/main.js', type='text/javascript')
 
     .angular-area(ng-app='main')
-        .applied-filters(ng-controller='appliedFilters')
-            a.btn(ng-click='clearFilters()', ng-show='filtersApplied()') Remove all filters
-            ul
-                li.btn(ng-repeat='filter in filters.currentFilters()')
-                    a {{filter.description}}
-                    a.btn(
-                        ng-click='removeFilter(this.filter)'
-                    ) x
+        applied-filters
         episode-list
 
