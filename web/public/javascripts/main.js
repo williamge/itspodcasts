@@ -156,4 +156,27 @@ angular.module("main", [])
                 filters.removeFilter(filter.name);
             };
         }
+    ])
+    .directive('removeFilterLink', function() {
+        return {
+            templateUrl: 'templates/removeFilterLink.html',
+            replace: true,
+            scope: {
+                filter: '='
+            },
+            controller: 'removeFilterLinkCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
+    .controller('removeFilterLinkCtrl', ['$scope', 'filtersService',
+        function($scope, filters) {
+
+            var self = this;
+
+            self.filter = $scope.filter;
+
+            self.removeFilter = function(filter) {
+                filters.removeFilter(filter.name);
+            };
+        }
     ]);
