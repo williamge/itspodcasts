@@ -114,13 +114,13 @@ angular.module("main", [])
 
             self.filterByDate = filters.filters.filterByDate;
 
-            self.setFilter = filters.addFilter;
+            self.addFilter = filters.addFilter;
 
             self.getChannelImageURL = function(channel) {
                 if (channel.images[0]._id) {
                     return '/channel_images/' + channel.images[0]._id + '.jpg';
                 } else {
-                    return null;
+                    return "";
                 }
             };
 
@@ -178,5 +178,30 @@ angular.module("main", [])
             self.removeFilter = function(filter) {
                 filters.removeFilter(filter.name);
             };
+        }
+    ])
+    .directive('filtersButton', function() {
+        return {
+            templateUrl: 'templates/filtersButton.html',
+            replace: true,
+            scope: {
+                episode: '='
+            },
+            controller: 'filtersButtonCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
+    .controller('filtersButtonCtrl', ['$scope', 'filtersService',
+        function($scope, filters) {
+
+            var self = this;
+
+            self.episode = $scope.episode;
+
+            self.filterByChannel = filters.filters.filterByChannel;
+
+            self.filterByDate = filters.filters.filterByDate;
+
+            self.addFilter = filters.addFilter;
         }
     ]);

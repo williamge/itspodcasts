@@ -71,6 +71,12 @@ EpisodeSchema.statics.getEpisodes = function(callingOptions, callback) {
         );
     }
 
+    if (options.select) {
+        aggregate = aggregate.select(
+            options.select
+        );
+    }
+
     if ( typeof options.limit !== 'undefined' ) {
         aggregate = aggregate.limit( options.limit );
     }
