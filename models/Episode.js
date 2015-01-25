@@ -16,7 +16,9 @@ var EpisodeSchema = mongoose.Schema( {
         ref: 'Channel',
         required: true
     },
-    channelTitle: String
+    channelTitle: String,
+    explicit: Boolean,
+    duration: Number
 });
 
 /**

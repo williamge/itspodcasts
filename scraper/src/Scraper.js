@@ -21,6 +21,12 @@ var defaultOptions = {
     softUpdate: false
 };
 
+function addIfExists(toAddTo, propertyToAddTo, toAdd) {
+    callIfExists(toAdd, function() {
+        toAddTo[propertyToAddTo] = toAdd;
+    });
+}
+
 function castAsCheerioXML(xml) {
 
     if (!xml) {
@@ -36,6 +42,31 @@ function castAsCheerioXML(xml) {
         });
     }
 }
+
+function callIfExists(object, fn) {
+    if (object != undefined) { // jshint ignore:line
+        return fn(object);
+    }
+}
+
+function isStringTruthy(input) {
+    var matchingRegex = /^\s*(yes|true)\s*$/i;
+    return matchingRegex.test(input);
+}
+
+function durationToSeconds(duration) {
+    var durationSplit = duration.split(":");
+    var durationInSeconds = 0;
+
+    //We only care about at most the first 3 items because that is how iTunes says to do it.
+    for (var i = Math.min(durationSplit.length, 3) - 1; i >= 0; i--) {
+        var secondsFactor = Math.pow(60, (durationSplit.length - 1) - i);
+        durationInSeconds += parseInt(durationSplit[i], 10) * secondsFactor;
+    }
+
+    return durationInSeconds;
+}
+
 
 function Scraper(options) {
     this.options = _.extend(defaultOptions, options);
@@ -77,13 +108,15 @@ Scraper.scrapeEpisode = function(elementXML) {
         description: Str($element('description').text()).stripTags().s
     };
 
-    if ($element('pubDate')) {
-        episode.pubDate = $element('pubDate').text();
+    addIfExists(episode, 'pubDate', $element('pubDate').text());
+    addIfExists(episode, 'guid', $element('guid').text());
+
+    var explicitString = $element('itunes\\:explicit').text();
+    if (explicitString) {
+        addIfExists(episode, 'explicit', callIfExists(explicitString, isStringTruthy));
     }
 
-    if ($element('guid')) {
-        episode.guid = $element('guid').text();
-    }
+    addIfExists(episode, 'duration', callIfExists($element('itunes\\:duration').text(), durationToSeconds));
 
     return episode;
 };
@@ -136,16 +169,26 @@ Scraper.prototype.scrapeChannel = function(channelXML, callback) {
     var self = this;
 
     var $channel = castAsCheerioXML(channelXML);
+    var newChannel = false;
 
     Channel.model.findOne({
         title: $channel('channel > title').text()
     }, function elementResult(err, channel) {
         if (!channel) {
-            channel = new Channel.model({
-                title: $channel('channel > title').text()
-            });
+            channel = new Channel.model();
             winston.info('Channel: [' + channel.title + '] was not found in the database');
+            newChannel = true;
         }
+
+        if (newChannel || self.options.softUpdate) {
+            addIfExists(channel, 'title', $channel('channel > title').text());
+
+            var explicitString = $channel('channel > itunes\\:explicit').text();
+            addIfExists(channel, 'explicit', callIfExists(explicitString, isStringTruthy));
+
+            addIfExists(channel, 'description', $channel('channel > description').text());
+        }
+
         self.channel = channel;
 
         self.channel.retrieveEpisodeCustomIDs(
@@ -157,7 +200,6 @@ Scraper.prototype.scrapeChannel = function(channelXML, callback) {
                 var episodes = Scraper.scrapeEpisodes($channel('item'));
                 self.addScrapedEpisodes(episodes, storedEpisodes);
 
-                //this makes no sense, use pimage in channel
                 self.channelImageURL = Scraper.scrapeImageURL($channel);
 
                 if (!self.channelImageURL) {

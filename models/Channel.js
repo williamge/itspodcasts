@@ -13,7 +13,10 @@ var ChannelSchema = mongoose.Schema( {
     /* TODO: rename this to episodeRefs or something along those lines, these aren't
      * really episodes, just a reference to their index */
     episodes: [ { type: String, ref: 'Episode' } ],
-    images: [PImage.schema]
+    images: [PImage.schema],
+    explicit: Boolean,
+    description: String,
+    category: [String]
 });
 
 ChannelSchema.virtual('updatedEpisodes').get(function() {
