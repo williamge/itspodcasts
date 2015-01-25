@@ -10,3 +10,5 @@ ul.episodes-list
       a.link(href='{{::episode.link}}') {{::ctrl.truncateLink(episode.link, 75)}}
       p.description  {{::episode.description}}
       filters-button(episode='::episode')
+      channel-info(channel='episode.channel')
+      episode-info(episode='episode')

@@ -6,6 +6,7 @@ var express = require('express');
 
 var routes = require('./routes');
 routes.images = require('./routes/images');
+routes.json = require('./routes/json');
 
 var config = require('./config');
 
@@ -48,7 +49,8 @@ app.get('/channel/:channelid/episodes', routes.channelEpisodes);
 app.get('/episode/:episodeid', routes.episode);
 app.get('/channel_images/:image_id', routes.images.channel_images);
 
-app.get('/json/episodes/recent', routes.recentEpisodes);
+app.get('/json/episodes/recent', routes.json.recentEpisodes);
+app.get('/json/channels/:id', routes.json.channel);
 
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));

@@ -1,5 +1,5 @@
 angular.module("main", [])
-    .factory("filtersService", [
+    .service("filtersService", [
 
         function() {
             var self = {};
@@ -203,5 +203,86 @@ angular.module("main", [])
             self.filterByDate = filters.filters.filterByDate;
 
             self.addFilter = filters.addFilter;
+        }
+    ])
+    .directive('channelInfo', function() {
+        return {
+            templateUrl: 'templates/channelInfo.html',
+            replace: true,
+            scope: {
+                channel: '='
+            },
+            controller: 'channelInfoCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
+    .controller('channelInfoCtrl', ['$scope',
+        function($scope) {
+
+            var self = this;
+
+            self.channel = $scope.channel;
+
+            self.explicit = function(channel) {
+                return channel.explicit === 'true';
+            };
+
+            self.showMore = false;
+
+            self.toggleInfo = function() {
+                self.showMore = !self.showMore;
+            };
+
+            self.getChannelImageURL = function(channel) {
+                if (channel.images[0]._id) {
+                    return '/channel_images/' + channel.images[0]._id + '.jpg';
+                } else {
+                    return "";
+                }
+            };
+
+        }
+    ])
+    .directive('episodeInfo', function() {
+        return {
+            templateUrl: 'templates/episodeInfo.html',
+            replace: true,
+            scope: {
+                episode: '='
+            },
+            controller: 'episodeInfoCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
+    .controller('episodeInfoCtrl', ['$scope',
+        function($scope) {
+
+            var self = this;
+
+            self.episode = $scope.episode;
+
+            self.showMore = false;
+
+            self.formatDuration = function(duration) {
+                var hours = Math.floor(duration / (60 * 60));
+                var minutes = Math.floor((duration - hours * 60 * 60) / 60);
+                var seconds = Math.floor(duration - hours * 60 * 60 - minutes * 60);
+
+                var formattedDuration = '';
+
+                if (hours > 0) {
+                    formattedDuration += ('00' + hours).slice(-2) + ':';
+                }
+                if (minutes > 0 || hours > 0) {
+                    formattedDuration += ('00' + minutes).slice(-2) + ':';
+                }
+                formattedDuration += ('00' + seconds).slice(-2);
+                return formattedDuration;
+
+            };
+
+            self.toggleInfo = function() {
+                self.showMore = !self.showMore;
+            };
         }
     ]);
