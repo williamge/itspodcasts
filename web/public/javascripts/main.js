@@ -124,6 +124,17 @@ angular.module("main", [])
                 }
             };
 
+            self.showEpisodeInfo = false;
+            self.showChannelInfo = false;
+
+            self.toggleEpisodeInfo = function() {
+                self.showEpisodeInfo = !self.showEpisodeInfo;
+            };
+
+            self.toggleChannelInfo = function() {
+                self.showChannelInfo = !self.showChannelInfo;
+            };
+
             $http.get(
                 '/json/episodes/recent'
             ).success(function(data) {

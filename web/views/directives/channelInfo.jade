@@ -1,9 +1,7 @@
 .channel-info
-   .btn(ng-click='ctrl.toggleInfo()') More about channel
-   .info(ng-if='ctrl.showMore')
-      .channel-image(class='small', ng-show='::ctrl.getChannelImageURL(channel)')
-         img(ng-src='{{::ctrl.getChannelImageURL(channel)}}')
-      h3.channel-title
-         a.channel-link(href='/channel/{{::ctrl.channel._id}}') {{::ctrl.channel.title}}
-      p.explicit(ng-if='::ctrl.channel.explicit') Explicit Content
-      p {{::ctrl.channel.description}}
+   .channel-image(class='small', ng-show='::ctrl.getChannelImageURL(channel)')
+      img(ng-src='{{::ctrl.getChannelImageURL(channel)}}')
+   h3.channel-title
+      a.channel-link(href='/channel/{{::ctrl.channel._id}}') {{::ctrl.channel.title}}
+   p.explicit(ng-if='::ctrl.channel.explicit') Explicit Content
+   p {{::ctrl.channel.description}}

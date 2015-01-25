@@ -1,8 +1,6 @@
 .episode-info
-   .btn(ng-click='ctrl.toggleInfo()') More about episode
-   .info(ng-if='ctrl.showMore')
-      h3
-         a.link(href='/episode/{{::ctrl.episode.episode._id}}') {{::ctrl.episode.episode.title}}
-      p.explicit(ng-if='::ctrl.episode.explicit') Explicit Content
-      p {{::ctrl.episode.description}}
-      p Duration: {{::ctrl.formatDuration(ctrl.episode.duration)}}
+   h3
+      a.link(href='/episode/{{::ctrl.episode.episode._id}}') {{::ctrl.episode.episode.title}}
+   p.explicit(ng-if='::ctrl.episode.explicit') Explicit Content
+   p {{::ctrl.episode.description}}
+   p Duration: {{::ctrl.formatDuration(ctrl.episode.duration)}}

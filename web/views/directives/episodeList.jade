@@ -10,5 +10,7 @@ ul.episodes-list
       a.link(href='{{::episode.link}}') {{::ctrl.truncateLink(episode.link, 75)}}
       p.description  {{::episode.description}}
       filters-button(episode='::episode')
-      channel-info(channel='episode.channel')
-      episode-info(episode='episode')
+      a.btn(ng-click='ctrl.toggleChannelInfo()') More about channel
+      channel-info(ng-if='ctrl.showChannelInfo', channel='episode.channel')
+      a.btn(ng-click='ctrl.toggleEpisodeInfo()') More about episode
+      episode-info(ng-if='ctrl.showEpisodeInfo', episode='episode')

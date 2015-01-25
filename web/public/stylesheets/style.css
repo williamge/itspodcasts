@@ -19,10 +19,6 @@ li.episode-container {
     border-top: 4px solid orange;
 }
 
-li.episode-container:hover {
-    background-color: #eee;
-}
-
 .channel-title {
     display: inline-block;
     margin: 0.5em 0;
@@ -44,14 +40,8 @@ li.episode-container:hover {
     text-decoration: underline;
 }
 
-.filter-link {
+.filters-button {
     font-size: 0.6rem;
-    padding: 1.5em;
-    text-decoration: none;
-}
-
-.filter-link:hover {
-    text-decoration: underline;
 }
 
 .link {
@@ -63,6 +53,13 @@ li.episode-container:hover {
 .btn {
     background: #eee;
     padding: 0.5em;
+    display: inline-block;
+    margin: 0.3em;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: #ddd;
 }
 
 .see-more {
