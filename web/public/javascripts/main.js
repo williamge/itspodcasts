@@ -210,10 +210,14 @@ angular.module("main", [])
             self.episode = $scope.episode;
 
             self.filterByChannel = filters.filters.filterByChannel;
-
             self.filterByDate = filters.filters.filterByDate;
-
             self.addFilter = filters.addFilter;
+
+            self.showFilters = false;
+
+            self.expandFilters = function() {
+                self.showFilters = !self.showFilters;
+            };
         }
     ])
     .directive('channelInfo', function() {

@@ -1,5 +1,7 @@
-ul.filters-button
-   li
-      a.btn.filter-link(ng-click='ctrl.addFilter(episode.channel.title, ctrl.filterByChannel)') Just this channel
-   li
-      a.btn.filter-link(ng-click='ctrl.addFilter(episode.pubDate, ctrl.filterByDate)') Just this day
+.filters-button
+   .btn(ng-click='ctrl.expandFilters()') expand
+   ul.floating-menu(ng-if='ctrl.showFilters')
+      li
+         a.btn.filter-link(ng-click='ctrl.addFilter(episode.channel.title, ctrl.filterByChannel)') Just this channel
+      li
+         a.btn.filter-link(ng-click='ctrl.addFilter(episode.pubDate, ctrl.filterByDate)') Just this day

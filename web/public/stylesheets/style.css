@@ -181,3 +181,11 @@ ul.channels-mosaic {
 .channel-info {
     overflow: auto;
 }
+
+.floating-menu {
+    position: absolute;
+    background: #555;
+    list-style: none;
+    padding: 0.5em;
+    border-radius: 3px;
+}
