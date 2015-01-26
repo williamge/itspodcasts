@@ -300,4 +300,32 @@ angular.module("main", [])
                 self.showMore = !self.showMore;
             };
         }
+    ])
+    .directive('collapsible', function() {
+        return {
+            templateUrl: 'templates/collapsible.html',
+            replace: true,
+            transclude: true,
+            scope: {
+                expandText: '@',
+                areaClass: '@'
+            },
+            controller: 'collapsibleCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
+    .controller('collapsibleCtrl', ['$scope',
+        function($scope) {
+
+            var self = this;
+
+            self.expandText = $scope.expandText || 'Expand';
+            self.areaClass = $scope.areaClass;
+
+            self.expand = false;
+
+            self.toggleExpand = function() {
+                self.expand = !self.expand;
+            };
+        }
     ]);

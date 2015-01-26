@@ -185,7 +185,20 @@ ul.channels-mosaic {
 .floating-menu {
     position: absolute;
     background: #555;
-    list-style: none;
     padding: 0.5em;
     border-radius: 3px;
+}
+
+.floating-menu > ul {
+    list-style: none;
+    padding: 0.5em;
+}
+
+
+.collapsible-button {
+    display: inline-block;
+}
+
+.collapsible-area {
+    display: block;
 }
