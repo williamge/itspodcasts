@@ -4,6 +4,11 @@ body {
 
 a {
   color: #00B7FF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 ul.episodes-list {
@@ -40,12 +45,15 @@ li.episode-container {
     text-decoration: underline;
 }
 
+.episode-link {
+    color: #555;
+}
+
 .filters-button {
     font-size: 0.6rem;
 }
 
 .link {
-    font-style: italic;
     font-size: 0.9em;
     display: block;
 }
@@ -56,10 +64,27 @@ li.episode-container {
     display: inline-block;
     margin: 0.3em;
     text-decoration: none;
+    box-shadow: 0px 1px 6px -2px rgba(0, 0, 0, 0.45);
+}
+
+.btn.flush {
+    background-color: inherit;
+    box-shadow: none;
 }
 
 .btn:hover {
+    box-shadow: 0px 1px 7px -1px rgba(0, 0, 0, 0.45);
     background: #ddd;
+}
+
+.floating-menu .btn {
+    background-color: inherit;
+    box-shadow: none;
+}
+
+.floating-menu .btn:hover {
+    box-shadow: 0px 1px 7px -1px rgba(0, 0, 0, 0.45);
+    background: #5F5F5F;
 }
 
 .see-more {
@@ -76,8 +101,9 @@ li.episode-container {
     margin-right: auto;
 }
 
-.menu {
-    background-color: #eee;
+.header {
+    background-color: rgba(123, 123, 123, 0.12);
+    padding: 0.2em 1em;
 }
 
 .menu > li {

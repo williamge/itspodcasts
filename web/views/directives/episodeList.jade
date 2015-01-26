@@ -3,7 +3,7 @@ ul.episodes-list
       .channel-image(class='small', ng-show='::ctrl.getChannelImageURL(episode.channel)')
          img(ng-src='{{::ctrl.getChannelImageURL(episode.channel)}}')
       h3
-         a.link(href='/episode/{{::episode._id}}') {{::episode.title}}
+         a.episode-link(href='/episode/{{::episode._id}}') {{::episode.title}}
       h4.channel-title
          a.channel-link(href='/channel/{{::episode.channel._id}}') {{::episode.channel.title}}
       p.date {{::ctrl.formatDate(episode.pubDate)}}
