@@ -328,4 +328,21 @@ angular.module("main", ['ngAnimate'])
                 self.expand = !self.expand;
             };
         }
+    ])
+    .directive('animClick', ['$parse', '$animate', '$rootScope',
+        function($parse, $animate, $rootScope) {
+            return {
+                restrict: 'A',
+                compile: function($element, attr) {
+                    var animClass = $parse(attr.animClick, /* interceptorFn */ null, /* expensiveChecks */ true);
+                    return function animClickHandler(scope, element) {
+                        element.on('click', function(event) {
+                            scope.$apply(function() {
+                                $animate.animate(element, {}, {}, animClass());
+                            });
+                        });
+                    };
+                }
+            };
+        }
     ]);
