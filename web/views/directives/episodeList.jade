@@ -1,5 +1,5 @@
 ul.episodes-list
-   li.episode-container(ng-repeat='episode in ctrl.episodes | filter:ctrl.episodesFilter')
+   li.episode-container(ng-repeat='episode in ctrl.episodes | filter:ctrl.episodesFilter' class='remove-animation')
       .channel-image(class='small', ng-show='::ctrl.getChannelImageURL(episode.channel)')
          img(ng-src='{{::ctrl.getChannelImageURL(episode.channel)}}')
       h3

@@ -1,4 +1,4 @@
-angular.module("main", [])
+angular.module("main", ['ngAnimate'])
     .service("filtersService", [
 
         function() {
