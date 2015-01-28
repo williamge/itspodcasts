@@ -69,7 +69,8 @@ li.episode-container {
     transition: box-shadow .1s, background .1s;
 }
 
-.btn.flush {
+.btn-flush,
+.btn-flush > .btn{
     background-color: inherit;
     box-shadow: none;
 }

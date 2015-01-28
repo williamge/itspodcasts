@@ -2,7 +2,9 @@ div.header
     h1.logo
         a(href='/')= "It's podcasts"
     ul.menu
-        li.btn.flush
-            a(href="/all") All content
-        li.btn.flush
-            a(href="/channels") Channels
+        li
+            std-button.btn-flush(href="/all")
+                ="All content"
+        li
+            std-button.btn-flush(href="/channels")
+                ="Channels"

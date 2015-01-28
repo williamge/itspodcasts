@@ -345,4 +345,11 @@ angular.module("main", ['ngAnimate'])
                 }
             };
         }
-    ]);
+    ])
+    .directive('stdButton', function() {
+        return {
+            templateUrl: 'templates/stdButton.html',
+            transclude: true,
+            replace: true
+        };
+    });
