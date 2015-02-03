@@ -1,0 +1,14 @@
+.filter-by
+    h2 Filter by:
+    collapsible(expand-text='Channel')
+        input(
+            type='search',
+            name='Channel',
+            ng-model='search.channel'
+        )
+        ul.results
+            li(ng-repeat='channel in ctrl.channels | filter: {title: search.channel} : ctrl.channelResultsFilter | limitTo: 5')
+                a.flat-btn(ng-click='ctrl.setChannelFilter(channel.title)')
+                    .channel-image(class='tiny', ng-show='::ctrl.getChannelImageURL(channel)')
+                        img(ng-src='{{::ctrl.getChannelImageURL(channel)}}')
+                    span.channel-description {{channel.title}}

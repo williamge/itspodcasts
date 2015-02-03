@@ -352,4 +352,45 @@ angular.module("main", ['ngAnimate'])
             transclude: true,
             replace: true
         };
-    });
+    })
+    .directive('filterBy', function() {
+        return {
+            templateUrl: 'templates/filterBy.html',
+            replace: true,
+            scope: true,
+            controller: 'filterByCtrl',
+            controllerAs: 'ctrl'
+        };
+    })
+    .controller('filterByCtrl', ['filtersService', '$scope', '$timeout', '$http',
+        function(filters, $scope, $timeout, $http) {
+
+            var self = this;
+
+            $http.get(
+                '/json/channels'
+            ).success(function(data) {
+                self.channels = data;
+            });
+
+            self.channelResultsFilter = function(channelTitle, filterTitle) {
+                if (filterTitle === '' || filterTitle === undefined) {
+                    return true;
+                }
+                return channelTitle.toLowerCase().indexOf(filterTitle.toLowerCase()) > -1;
+            };
+
+            self.getChannelImageURL = function(channel) {
+                if (channel.images[0]._id) {
+                    return '/channel_images/' + channel.images[0]._id + '.jpg';
+                } else {
+                    return "";
+                }
+            };
+
+
+            self.setChannelFilter = function(channelTitle) {
+                filters.addFilter(channelTitle, filters.filters.filterByChannel);
+            };
+        }
+    ]);

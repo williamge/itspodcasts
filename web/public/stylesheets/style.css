@@ -136,6 +136,13 @@ li.episode-container {
     float: left;
 }
 
+.channel-image.tiny {
+    width: 30px;
+    height: 30px;
+    float: left;
+    margin: 0.25em;
+}
+
 .channel-image.medium {
     max-height: 145px;
 }
@@ -293,4 +300,33 @@ ul.channels-mosaic {
         transform: scale(0.9,0.9);
         opacity: 0.0;
     }
+}
+
+.results li {
+    list-style: none;
+    border-top: 1px solid #eee
+}
+
+.results:after {
+    content: "";
+    border-top: 1px solid #eee;
+    display: block;
+}
+
+.results li > a {
+    overflow: auto;
+}
+
+.results .channel-description {
+    margin-left: 1em;
+}
+
+.flat-btn {
+    padding: 0.5em;
+    display: block;
+}
+
+.flat-btn:hover {
+    background-color: #eee;
+    border: 1px solid #ddd;
 }
