@@ -22,7 +22,7 @@ var defaultOptions = {
 };
 
 function addIfExists(toAddTo, propertyToAddTo, toAdd) {
-    callIfExists(toAdd, function() {
+    callIfNotEmpty(toAdd, function() {
         toAddTo[propertyToAddTo] = toAdd;
     });
 }
@@ -47,6 +47,15 @@ function callIfExists(object, fn) {
     if (object != undefined) { // jshint ignore:line
         return fn(object);
     }
+}
+
+function callIfNotEmpty(object, fn) {
+    callIfExists(object,
+        function() {
+            if (object !== '') {
+                return fn(object);
+            }
+        });
 }
 
 function isStringTruthy(input) {
@@ -113,10 +122,10 @@ Scraper.scrapeEpisode = function(elementXML) {
 
     var explicitString = $element('itunes\\:explicit').text();
     if (explicitString) {
-        addIfExists(episode, 'explicit', callIfExists(explicitString, isStringTruthy));
+        addIfExists(episode, 'explicit', callIfNotEmpty(explicitString, isStringTruthy));
     }
 
-    addIfExists(episode, 'duration', callIfExists($element('itunes\\:duration').text(), durationToSeconds));
+    addIfExists(episode, 'duration', callIfNotEmpty($element('itunes\\:duration').text(), durationToSeconds));
 
     return episode;
 };
