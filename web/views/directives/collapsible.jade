@@ -1,3 +1,3 @@
 .collapsible-button
-   a.btn(ng-click='ctrl.toggleExpand()' anim-click='"btn-click"') {{ctrl.expandText}}
+   std-button(ng-click='ctrl.toggleExpand()') {{ctrl.expandText}}
    .collapsible-area(ng-if='ctrl.expand', ng-transclude, class='{{ctrl.areaClass}}')

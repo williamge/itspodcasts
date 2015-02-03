@@ -1,4 +1,4 @@
 .applied-filters
-    a.btn(ng-click='ctrl.clearFilters()', ng-show='ctrl.filtersApplied()') Remove all filters
+    std-button(ng-click='ctrl.clearFilters()', ng-show='ctrl.filtersApplied()') Remove all filters
     ul
-         li(remove-filter-link, filter='::filter' ng-repeat='filter in ctrl.filters.currentFilters()')
+         li(remove-filter-link, filter='::filter', ng-repeat='filter in ctrl.filters.currentFilters()')
