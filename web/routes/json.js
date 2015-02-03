@@ -41,3 +41,18 @@ exports.channel = function(req, res) {
             }
     );
 };
+
+exports.channels = function(req, res) {
+    Channel.model.find()
+        .select('title images')
+        .exec(
+            function(err, channels) {
+                if (err) {
+                    winston.error("all channels json error: " +
+                        err);
+                }
+
+                res.json(channels);
+            }
+    );
+};
