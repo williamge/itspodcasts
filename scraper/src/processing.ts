@@ -1,14 +1,22 @@
-/** @module Channel */
 
-var fs = require('fs'),
-    path = require('path'),
-    async = require('async'),
-    request = require('request'),
-    winston = require('winston');
+/// <reference path="../../typings/lodash/lodash.d.ts" />
+/// <reference path="../../typings/winston/winston.d.ts" />
+/// <reference path="../../typings/async/async.d.ts" />
+/// <reference path="../../typings/node/node.d.ts" />
+/// <reference path="../../typings/minimist/minimist.d.ts" />
+/// <reference path="../../typings/request/request.d.ts" />
 
-var Channel = require('../../models/Channel'),
-    Episode = require('../../models/Episode'),
-    Scraper = require('./Scraper');
+
+import PodcastSource = require('../../models/PodcastSource');
+import path = require('path');
+import fs = require('fs');
+import async = require('async');
+import request = require('request');
+import winston = require('winston');
+
+import Channel = require('../../models/Channel');
+import Episode = require('../../models/Episode');
+import Scraper = require('./Scraper');
 
 module.exports = function(options) {
     options = options || {};

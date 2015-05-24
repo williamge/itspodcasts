@@ -1,10 +1,20 @@
-var minimistArgv = require('minimist')(process.argv.slice(2)),
-    path = require('path'),
-    _ = require('lodash');
+/// <reference path="../../typings/mongoose/mongoose.d.ts" />
+/// <reference path="../../typings/lodash/lodash.d.ts" />
+/// <reference path="../../typings/winston/winston.d.ts" />
+/// <reference path="../../typings/async/async.d.ts" />
+/// <reference path="../../typings/node/node.d.ts" />
+/// <reference path="../../typings/minimist/minimist.d.ts" />
 
-var PodcastSource = require('../../models/PodcastSource');
 
-var cmdline_help_text = "Available arguments:\n" +
+import _ = require('lodash');
+import PodcastSource = require('../../models/PodcastSource');
+import minimist = require('minimist');
+import path = require('path');
+
+var minimistArgv: any = minimist(process.argv.slice(2));
+
+
+export var cmdline_help_text = "Available arguments:\n" +
     "The following options will allow you to save the source by appending a comma and 'y', 'yes', or 'save' after the source location\n" +
     "--rss : Specify an RSS feed URL to scrape from\n" +
     "--file : Specify an XML file to read\n" +
@@ -34,7 +44,7 @@ function podcastXMLSource() {
         );
 
         XMLSource = _.map(sourcesFileSources,
-            function(sourceItem) {
+            function(sourceItem: any) {
 
                 if (sourceItem.type === 'rss' && saveSourcesFileSourceToDB) {
                     _.extend(sourceItem, {
@@ -52,7 +62,7 @@ function podcastXMLSource() {
             minimistArgv.rss = [minimistArgv.rss];
         }
         _.each(minimistArgv.rss,
-            function(rssFeed) {
+            function(rssFeed: any) {
                 var rssArgSplit = rssFeed.split(",");
                 var rssURL = rssArgSplit[0];
                 var saveRssSourceToDB = interpretSaveOption(rssArgSplit[1]) || false;
@@ -69,7 +79,7 @@ function podcastXMLSource() {
             minimistArgv.file = [minimistArgv.file];
         }
         _.each(minimistArgv.file,
-            function(fileFeed) {
+            function(fileFeed: any) {
                 var fileArgSplit = fileFeed.split(",");
                 var fileURL = fileArgSplit[0];
 
@@ -84,10 +94,10 @@ function podcastXMLSource() {
     return XMLSource;
 }
 
-module.exports = {
-    mongoURL: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URL || 'mongodb://localhost/podcasts',
-    XMLSource: podcastXMLSource(),
-    softUpdate: minimistArgv['soft-update'] || false,
-    getSourcesFromDB: minimistArgv['db-sources'] || false,
-    cmdline_help_text: cmdline_help_text
-};
+export var mongoURL = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGO_URL || 'mongodb://localhost/podcasts';
+
+export var XMLSource = podcastXMLSource();
+
+export var softUpdate = minimistArgv['soft-update'] || false;
+
+export var getSourcesFromDB =  minimistArgv['db-sources'] || false;

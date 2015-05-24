@@ -1,12 +1,13 @@
-/** @module Channel */
+/// <reference path="../typings/mongoose/mongoose.d.ts" />
+/// <reference path="../typings/lodash/lodash.d.ts" />
+/// <reference path="../typings/winston/winston.d.ts" />
 
-var mongoose = require('mongoose'),
-    _ = require('lodash'),
-    winston = require('winston');
-
-var PodcastSource = require('../models/PodcastSource');
-
-var configFromFile = require('./src/config');
+import mongoose = require('mongoose');
+import _ = require('lodash');
+import winston = require('winston');
+import Episode = require('../models/Episode');
+import PodcastSource = require('../models/PodcastSource');
+import configFromFile = require('./src/config');
 
 if (require.main === module) {
     scraper(configFromFile).main();
@@ -81,7 +82,7 @@ function scraper(config) {
         } else {
             _.forEach(
                 config.XMLSource,
-                function(sourceEntry) {
+                function(sourceEntry: any) {
                     if (sourceEntry.saveToDB) {
                         sourceEntry.save(
                             function(err) {

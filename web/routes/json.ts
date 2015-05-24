@@ -8,7 +8,7 @@ import Channel = require('../../models/Channel');
 import Episode = require('../../models/Episode');
 import winston = require('winston');
 
-exports.recentEpisodes = function(req, res) {
+export var recentEpisodes = function(req, res) {
     Episode.model.getEpisodes({
         sort: {
             pubDate: -1
@@ -30,7 +30,7 @@ exports.recentEpisodes = function(req, res) {
     );
 };
 
-exports.channel = function(req, res) {
+export var channel = function(req, res) {
     Channel.model.find({
         _id: req.params.id
     })
@@ -46,7 +46,7 @@ exports.channel = function(req, res) {
     );
 };
 
-exports.channels = function(req, res) {
+export var channels = function(req, res) {
     Channel.model.find()
         .select('title images')
         .exec(
