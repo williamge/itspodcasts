@@ -2,18 +2,20 @@
  * Module dependencies.
  */
 
-var express = require('express');
+/// <reference path="../typings/express/express.d.ts" />
 
-var routes = require('./routes');
-routes.images = require('./routes/images');
-routes.json = require('./routes/json');
+import express = require('express');
 
-var config = require('./config');
+import routes = require('./routes/index');
+import routes_images = require('./routes/images');
+import routes_json = require('./routes/json');
 
-var http = require('http');
-var path = require('path');
+import config = require('./config');
 
-var mongoose = require('mongoose');
+import http = require('http');
+import path = require('path');
+
+import mongoose = require('mongoose');
 
 var app = express();
 
@@ -47,11 +49,11 @@ app.get('/channels', routes.channels);
 app.get('/channel/:channelid', routes.channel);
 app.get('/channel/:channelid/episodes', routes.channelEpisodes);
 app.get('/episode/:episodeid', routes.episode);
-app.get('/channel_images/:image_id', routes.images.channel_images);
+app.get('/channel_images/:image_id', routes_images.channel_images);
 
-app.get('/json/episodes/recent', routes.json.recentEpisodes);
-app.get('/json/channels/:id', routes.json.channel);
-app.get('/json/channels', routes.json.channels);
+app.get('/json/episodes/recent', routes_json.recentEpisodes);
+app.get('/json/channels/:id', routes_json.channel);
+app.get('/json/channels', routes_json.channels);
 
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));

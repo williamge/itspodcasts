@@ -1,8 +1,12 @@
-var mongoose = require('mongoose'),
-    _ = require('lodash'),
-    winston = require('winston'),
-    Channel = require('../../models/Channel'),
-    Episode = require('../../models/Episode');
+/// <reference path="../../typings/mongoose/mongoose.d.ts" />
+/// <reference path="../../typings/lodash/lodash.d.ts" />
+/// <reference path="../../typings/winston/winston.d.ts" />
+
+import mongoose = require('mongoose');
+import _ = require('lodash');
+import Channel = require('../../models/Channel');
+import Episode = require('../../models/Episode');
+import winston = require('winston');
 
 exports.recentEpisodes = function(req, res) {
     Episode.model.getEpisodes({

@@ -1,14 +1,19 @@
-var mongoose = require('mongoose'),
-    _ = require('lodash'),
-    Channel = require('../../models/Channel'),
-    Episode = require('../../models/Episode');
+/// <reference path="../../typings/mongoose/mongoose.d.ts" />
+/// <reference path="../../typings/lodash/lodash.d.ts" />
+/// <reference path="../../typings/winston/winston.d.ts" />
+
+import mongoose = require('mongoose');
+import _ = require('lodash');
+import Channel = require('../../models/Channel');
+import Episode = require('../../models/Episode');
+import winston = require('winston');
 
 
 /*
  * GET home page.
  */
 
-exports.index = function(req, res) {
+export var index = function(req, res) {
 
     Episode.model.getEpisodes({
         sort: {
@@ -29,7 +34,7 @@ exports.index = function(req, res) {
     );
 };
 
-exports.allContent = function(req, res) {
+export var allContent = function(req, res) {
 
     Channel.model.find()
         .populate('episodes')
@@ -43,7 +48,7 @@ exports.allContent = function(req, res) {
     );
 };
 
-exports.channels = function(req, res) {
+export var channels = function(req, res) {
 
     Channel.model
         .find()
@@ -63,7 +68,7 @@ exports.channels = function(req, res) {
     );
 };
 
-exports.channel = function(req, res) {
+export var channel = function(req, res) {
 
     if (!req.params.channelid) {
         winston.error("Channel ID not found", req);
@@ -96,7 +101,7 @@ exports.channel = function(req, res) {
     );
 };
 
-exports.episode = function(req, res) {
+export var episode = function(req, res) {
 
     if (!req.params.episodeid) {
         winston.error("Channel ID not found", req);
@@ -121,7 +126,7 @@ exports.episode = function(req, res) {
     );
 };
 
-exports.channelEpisodes = function(req, res) {
+export var channelEpisodes = function(req, res) {
 
     if (!req.params.channelid) {
         winston.error("Channel ID not found", req);

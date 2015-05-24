@@ -1,9 +1,12 @@
 /** @module Channel */
 
-var mongoose = require('mongoose'),
-    _ = require('lodash');
+/// <reference path="../typings/mongoose/mongoose.d.ts" />
+/// <reference path="../typings/lodash/lodash.d.ts" />
 
-var EpisodeSchema = mongoose.Schema( {
+import mongoose = require('mongoose');
+import _ = require('lodash');
+
+var EpisodeSchema = new mongoose.Schema( {
 
     customID: { type: String, index: true },
     title: String,
@@ -35,12 +38,12 @@ EpisodeSchema.pre('save', function(next) {
  * Returns a unique identifier for the current Episode
  * @return {String} Unique ID for the Episode
  */
-EpisodeSchema.methods.getCustomID = function() {
+EpisodeSchema.method('getCustomID', function() {
     if (!this.customID) {
         this.customID = this.guid || this.link;
     }
     return this.customID;
-};
+});
 
 EpisodeSchema.virtual('URLsafeID').get(function () {
     return this._id;
@@ -52,7 +55,7 @@ EpisodeSchema.virtual('URLsafeID').get(function () {
  * @param  {Object}   callingOptions optional object with options for the query to be run
  * @param  {Function} callback       callback that will be called with any errors and with the list of retrieved episodes
  */
-EpisodeSchema.statics.getEpisodes = function(callingOptions, callback) {
+EpisodeSchema.static('getEpisodes', function(callingOptions: any, callback) {
 
     if ('function' === typeof callingOptions) {
         callback = callingOptions;
@@ -63,7 +66,7 @@ EpisodeSchema.statics.getEpisodes = function(callingOptions, callback) {
         limit: 50
     };
 
-    var options = _.extend(defaultOptions, callingOptions);
+    var options: any = _.extend(defaultOptions, callingOptions);
 
     var aggregate = this.find();
 
@@ -84,15 +87,13 @@ EpisodeSchema.statics.getEpisodes = function(callingOptions, callback) {
     }
 
     return aggregate;
-};
+});
 
-EpisodeSchema.statics.getEpisodesNow = function(callingOptions, callback) {
+EpisodeSchema.static('getEpisodesNow', function(callingOptions, callback) {
     this.getEpisodes(callingOptions).exec(callback);
-};
+});
 
-var Episode = mongoose.model('Episode', EpisodeSchema);
+export var Episode = mongoose.model('Episode', EpisodeSchema);
 
-module.exports = {
-    schema: EpisodeSchema,
-    model: Episode
-};
+export var schema = EpisodeSchema;
+export var model = Episode;

@@ -1,14 +1,20 @@
 /** @module Channel */
 
-var mongoose = require('mongoose'),
-    _ = require('lodash'),
-    async = require('async'),
-    assert = require('assert');
+/// <reference path="../typings/mongoose/mongoose.d.ts" />
+/// <reference path="../typings/lodash/lodash.d.ts" />
+/// <reference path="../typings/winston/winston.d.ts" />
+/// <reference path="../typings/async/async.d.ts" />
 
-var Episode = require('./Episode'),
-    PImage = require('./PImage');
+import mongoose = require('mongoose');
+import _ = require('lodash');
+import Episode = require('./Episode');
+import winston = require('winston');
+import async = require('async');
+import assert = require('assert');
+import PImage = require('./PImage');
 
-var ChannelSchema = mongoose.Schema( {
+
+var ChannelSchema = new mongoose.Schema( {
     title: { type: String, required: true },
     /* TODO: rename this to episodeRefs or something along those lines, these aren't
      * really episodes, just a reference to their index */
@@ -42,10 +48,10 @@ ChannelSchema.pre('save', function (nextMiddleware) {
 
     return async.parallel(
         [
-            function saveAddedEpisodes(done) {
+            function saveAddedEpisodes(done: any) {
                 async.each(
                     selfChannel._addedEpisodes || [],
-                    function saveEpisode(episode, next) {
+                    function saveEpisode(episode: any, next) {
                         _.extend(episode, channelDetails(selfChannel));
 
                         episode.save(next);
@@ -55,10 +61,10 @@ ChannelSchema.pre('save', function (nextMiddleware) {
                     }
                 );
             },
-            function saveUpdatedEpisodes(done) {
+            function saveUpdatedEpisodes(done: any) {
                 async.each(
                     selfChannel._updatedEpisodes || [],
-                    function updateEpisode(episode, next) {
+                    function updateEpisode(episode: any, next) {
                         Episode.model.findOne({customID: episode.getCustomID() })
                             .exec(
                             function (err, episodeFromDB) {
@@ -71,7 +77,7 @@ ChannelSchema.pre('save', function (nextMiddleware) {
                                 assert(!selfChannel.isNew);
 
                                 delete episode._doc._id;
-                                var updatedEpisode = _.extend(episodeFromDB, episode.toObject());
+                                var updatedEpisode: any = _.extend(episodeFromDB, episode.toObject());
                                 updatedEpisode.save(next);
                             }
                         );
@@ -81,7 +87,7 @@ ChannelSchema.pre('save', function (nextMiddleware) {
                     }
                 );
             },
-            function saveUnsavedImages(done){
+            function saveUnsavedImages(done: any){
                     async.each(
                         selfChannel.unsavedImages || [],
                         function saveImage(image, next) {
@@ -100,7 +106,7 @@ ChannelSchema.pre('save', function (nextMiddleware) {
     );
 });
 
-ChannelSchema.methods.retrieveEpisodeCustomIDs = function(callback) {
+ChannelSchema.method('retrieveEpisodeCustomIDs', function(callback) {
     Episode.model
         .find({
             channel: this._id
@@ -112,45 +118,45 @@ ChannelSchema.methods.retrieveEpisodeCustomIDs = function(callback) {
                 }
 
                 var storedCustomIDs = _.map(storedEpisodes,
-                    function (episode) {
+                    function (episode: any) {
                         return episode.customID;
                     });
                 return callback(null, storedCustomIDs);
             }
         );
-};
+});
 
 /**
  * Returns a unique identifier for the current Channel
  * @return {String} Unique ID for the Channel
  */
-ChannelSchema.methods.getID = function() {
+ChannelSchema.method('getID', function() {
     return this.title;
-};
+});
 
 /**
  * Returns a list of episodes that have been updated during this model's
  * lifetime.
  * @return {Array} List of updated Episode models
  */
-ChannelSchema.methods.getUpdatedEpisodes = function() {
+ChannelSchema.method('getUpdatedEpisodes', function() {
     return this._updatedEpisodes || [];
-};
+});
 
 /**
  * Returns a list of episodes that have been added during this model's lifetime.
  * @return {Array} List of added Episode models
  */
-ChannelSchema.methods.getAddedEpisodes = function() {
+ChannelSchema.method('getAddedEpisodes', function() {
     return this._addedEpisodes || [];
-};
+});
 
 /**
  * Adds an Episode to the list of Episode objects for the current Channel. Also keeps track of the Episode objects added to the Channel since being 
  * created or retrieved, whichever action happened last.
  * @param {Episode} episode Episode to be added to the current Channel
  */
-ChannelSchema.methods.addEpisode = function(episode) {
+ChannelSchema.method('addEpisode', function(episode) {
     if (!(episode instanceof Episode.model)) {
         throw new TypeError("Passed episode not of type Episode");
     }
@@ -159,33 +165,33 @@ ChannelSchema.methods.addEpisode = function(episode) {
 
     this._addedEpisodes = this._addedEpisodes || [];
     this._addedEpisodes.push(episode);
-};
+});
 
 /**
  * Updates an Episode for the current channel and keeps track of the updated Episodes
  * @param  {Episode} episode Episode to be updated for the current Channel
  */
-ChannelSchema.methods.updateEpisode = function(episode) {
+ChannelSchema.method('updateEpisode', function(episode) {
     if (!(episode instanceof Episode.model)) {
         throw new TypeError("Passed episode not of type Episode");
     }
 
     this._updatedEpisodes = this._updatedEpisodes || [];
     this._updatedEpisodes.push(episode);
-};
+});
 
-ChannelSchema.methods.getLastImage = function() {
+ChannelSchema.method('getLastImage', function() {
     if (this.images.length > 0) {
         return this.images[this.images.length-1];
     } else {
         return null;
     }
-};
+});
 
-ChannelSchema.methods.addImage = function(pimage) {
+ChannelSchema.method('addImage', function(pimage) {
     var self = this;
     self.images.push(pimage);
-    self.images[[self.images.length-1]].saved = false;
+    self.images[self.images.length-1].saved = false;
     self.unsavedImages = self.unsavedImages || [];
     //Note: when the PImage instance is added to self.images, since self.images is an array
     //handled by mongoose, non-schema properties will be dropped apparently, such as one we are
@@ -194,9 +200,9 @@ ChannelSchema.methods.addImage = function(pimage) {
     //
     //I wish mongoose had better support for GridFS to make this a lot cleaner but unfortunately it doesn't.
     self.unsavedImages.push(pimage);
-};
+});
 
-ChannelSchema.methods.saveImage = function(image, callback) {
+ChannelSchema.method('saveImage', function(image, callback) {
     var self = this;
 
     var original_imageID = image._id;
@@ -208,7 +214,7 @@ ChannelSchema.methods.saveImage = function(image, callback) {
             }
 
 
-            var matchingUnsavedImages = _.filter(self.unsavedImages, function(filter_image) {
+            var matchingUnsavedImages = _.filter(self.unsavedImages, function(filter_image: any) {
                 return filter_image.originalURL === image.originalURL;
             });
 
@@ -216,7 +222,7 @@ ChannelSchema.methods.saveImage = function(image, callback) {
                 self.images.push(savedImage);
             } else {
                 self.unsavedImages = _.filter(self.unsavedImages,
-                    function filterImage(filter_image) {
+                    function filterImage(filter_image: any) {
                         return filter_image.originalURL !== image.originalURL;
                     });
 
@@ -225,7 +231,7 @@ ChannelSchema.methods.saveImage = function(image, callback) {
                 //If the image was already added to the 'channel.images' array then
                 //it's _id will be different from what it should be, if so then we
                 //just update that image to be the one we saved, which will have a new id
-                self.images = _.map(self.images, function(imageFromImages) {
+                self.images = _.map(self.images, function(imageFromImages: any) {
                     if (imageFromImages._id || imageFromImages === original_imageID) {
                         return savedImage;
                     } else {
@@ -237,11 +243,9 @@ ChannelSchema.methods.saveImage = function(image, callback) {
             return callback(null, self);
         }
     );
-};
+});
 
 var Channel = mongoose.model('Channel', ChannelSchema);
 
-module.exports = {
-    schema: ChannelSchema,
-    model: Channel
-};
+export var schema = ChannelSchema;
+export var model = Channel;
