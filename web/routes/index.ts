@@ -15,7 +15,7 @@ import winston = require('winston');
 
 export var index = function(req, res) {
 
-    Episode.model.getEpisodes({
+    (<any>Episode.model).getEpisodes({
         sort: {
             pubDate: -1
         }
@@ -36,7 +36,7 @@ export var index = function(req, res) {
 
 export var allContent = function(req, res) {
 
-    Channel.model.find()
+    (<any> Channel.model).find()
         .populate('episodes')
         .exec(
             function(err, channel) {
@@ -50,7 +50,7 @@ export var allContent = function(req, res) {
 
 export var channels = function(req, res) {
 
-    Channel.model
+    (<any> Channel.model)
         .find()
         .sort('title')
         .exec(
@@ -88,7 +88,7 @@ export var channel = function(req, res) {
             }
         })
         .exec(
-            function(err, channel) {
+            function(err, channel: any) {
                 if (!channel) {
                     return res.send(404, "Sorry, we couldn't find that channel");
                 }
@@ -145,7 +145,7 @@ export var channelEpisodes = function(req, res) {
             }
         })
         .exec(
-            function(err, channel) {
+            function(err, channel: any) {
                 res.render('channelEpisodes', {
                     title: channel.title,
                     channel: channel

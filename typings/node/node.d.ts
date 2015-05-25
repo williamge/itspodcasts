@@ -3,6 +3,8 @@
 // Definitions by: Microsoft TypeScript <http://typescriptlang.org>, DefinitelyTyped <https://github.com/borisyankov/DefinitelyTyped>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
+/// <reference path="../lib.es6.d.ts" />
+
 /************************************************
 *                                               *
 *               Node.js v0.12.0 API             *

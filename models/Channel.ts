@@ -245,7 +245,7 @@ ChannelSchema.method('saveImage', function(image, callback) {
     );
 });
 
-var Channel = mongoose.model('Channel', ChannelSchema);
+var Channel = mongoose.model<any>('Channel', ChannelSchema);
 
 export var schema = ChannelSchema;
 export var model = Channel;

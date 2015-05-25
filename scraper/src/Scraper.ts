@@ -156,7 +156,7 @@ class Scraper {
             episodes = [];
 
         episodesXML.each(function(i, episodeXML) {
-            var episode = new Episode.model(this.scrapeEpisode(episodeXML));
+            var episode = new Episode.model(Scraper.scrapeEpisode(episodeXML));
             episodes.push(episode);
             seenEpisodeCount++;
         });
@@ -195,7 +195,8 @@ class Scraper {
             title: $channel('channel > title').text()
         }, function elementResult(err, channel: any) {
             if (!channel) {
-                channel = new Channel.model();
+                var ChannelModel = Channel.model.bind(Channel);
+                channel = new ChannelModel();
                 winston.info('Channel: [' + channel.title + '] was not found in the database');
                 newChannel = true;
             }
@@ -257,7 +258,7 @@ class Scraper {
                         originalURL: self.channelImageURL
                     });
 
-                    scrapedImage.imageBuffer = imageResponse;
+                    (<any> scrapedImage).imageBuffer = imageResponse;
 
                     self.channel.addImage(scrapedImage);
 
@@ -289,7 +290,7 @@ function requestImage(url, callback) {
             }
             switch (response.statusCode) {
                 case 200:
-                    var grid = new mongodb.Grid(mongoose.connection.db, 'channel_images');
+                    var grid = new (<any> mongodb).Grid(mongoose.connection.db, 'channel_images');
                     return callback(err, body);
                 default:
                     return callback(err);
@@ -299,4 +300,4 @@ function requestImage(url, callback) {
 }
 
 
-module.exports = Scraper;
+export = Scraper;

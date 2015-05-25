@@ -9,7 +9,7 @@ import Episode = require('../../models/Episode');
 import winston = require('winston');
 
 export var recentEpisodes = function(req, res) {
-    Episode.model.getEpisodes({
+    (<any> Episode.model).getEpisodes({
         sort: {
             pubDate: -1
         },
@@ -47,7 +47,7 @@ export var channel = function(req, res) {
 };
 
 export var channels = function(req, res) {
-    Channel.model.find()
+    (<any> Channel.model).find()
         .select('title images')
         .exec(
             function(err, channels) {

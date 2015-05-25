@@ -19,21 +19,24 @@ import mongoose = require('mongoose');
 
 var app = express();
 
+//For thwarting the mismatched versions of the typescript definitions for express, since this is on v3 and the definitions are for v4
+var anyExpress = <any> express;
+
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(express.methodOverride());
+app.use(anyExpress.favicon());
+app.use(anyExpress.logger('dev'));
+app.use(anyExpress.json());
+app.use(anyExpress.urlencoded());
+app.use(anyExpress.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-    app.use(express.errorHandler());
+    app.use(anyExpress.errorHandler());
 }
 
 app.get('/templates/:template',

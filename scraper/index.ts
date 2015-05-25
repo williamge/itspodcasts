@@ -8,6 +8,7 @@ import winston = require('winston');
 import Episode = require('../models/Episode');
 import PodcastSource = require('../models/PodcastSource');
 import configFromFile = require('./src/config');
+import processingPackage = require('./src/processing');
 
 if (require.main === module) {
     scraper(configFromFile).main();
@@ -15,7 +16,7 @@ if (require.main === module) {
 
 function scraper(config) {
 
-    var processing = require('./src/processing.js')(createOptions(config));
+    var processing = processingPackage(createOptions(config));
 
     /**
      * Creates an object with options for the processing module.

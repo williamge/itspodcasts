@@ -18,7 +18,7 @@ import Channel = require('../../models/Channel');
 import Episode = require('../../models/Episode');
 import Scraper = require('./Scraper');
 
-module.exports = function(options) {
+export = function(options) {
     options = options || {};
 
     /**
@@ -139,7 +139,7 @@ module.exports = function(options) {
              * @param  source   A source object to scrape
              * @param  {doneCallback} done   Callback that is called when scraping is complete, or on an error.
              */
-            function mainIterator(source, done) {
+            function mainIterator(source: any, done) {
                 winston.info("Working on source: ", {
                     source: source.source,
                     type: source.type

@@ -18,7 +18,7 @@ export var channel_images = function(req, res) {
 
     var image_id = req.params.image_id.replace(".jpg", "");
 
-    PImage.model.getImage(image_id,
+    (<any> PImage.model).getImage(image_id,
         function(err, image) {
             if (err) {
                 winston.error(err);
