@@ -19,6 +19,9 @@
     "build:web:public:ts" : "tsc -m commonjs web/public/javascripts/main.ts",
     "build:web:ts" : "tsc --module commonjs web/app.ts",
     "build:web" : "npm run build:web:public:ts && npm run build:web:ts",
+    "build:scraper:ts" : "tsc --module commonjs scraper/index.ts",
+    "build:scraper" : "npm run build:scraper:ts",
+    "postinstall": "npm run build:web && npm run build:scraper",
     "web": "node web/app.js"
   },
   "dependencies": {
