@@ -9,6 +9,9 @@ import Episode = require('../../models/Episode');
 import winston = require('winston');
 
 export var recentEpisodes = function(req, res) {
+    //TODO(wg): Having an 'any' type is not good, yet there is no way for the mongoose typings to expose the interface
+    // for the static methods we assigned to Episode, so the <any> is necessary here. In the future just get rid of the
+    // object creation through mongoose and use mongoose internally in an Episode class to sidestep all of this.
     (<any> Episode.model).getEpisodes({
         sort: {
             pubDate: -1
@@ -47,7 +50,7 @@ export var channel = function(req, res) {
 };
 
 export var channels = function(req, res) {
-    (<any> Channel.model).find()
+    Channel.model.find(null)
         .select('title images')
         .exec(
             function(err, channels) {

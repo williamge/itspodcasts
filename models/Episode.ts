@@ -6,6 +6,28 @@
 import mongoose = require('mongoose');
 import _ = require('lodash');
 
+export interface IEpisodeSchema {
+    getEpisodes: (callingOptions ?: any) => mongoose.Query<any[]>;
+    customID: String;
+    title: String;
+    link: String;
+    description: String;
+    pubDate: Date;
+    guid: String;
+    channel: mongoose.Types.ObjectId;
+    channelTitle: String;
+    Explicit: Boolean;
+    duration: Number;
+
+    URLsafeID: String;
+
+    getCustomID: () => String;
+
+    getEpisodesNow: (callingOptions: any, callback: (err: any, res: any) => void) => void;
+}
+
+export interface IEpisodeModel extends IEpisodeSchema, mongoose.Document {}
+
 var EpisodeSchema = new mongoose.Schema( {
 
     customID: { type: String, index: true },
@@ -49,24 +71,25 @@ EpisodeSchema.virtual('URLsafeID').get(function () {
     return this._id;
 });
 
+interface getEpisodesOptions {
+    limit: number;
+    sort ?: any;
+    select ?: any;
+}
+
 /**
  * Retrieves a list of all episode objects, with a limit of 50 by default. Limit and 
  * sorting behaviour is defined in callingOptions using the equivalent MongoDB expected objects.
  * @param  {Object}   callingOptions optional object with options for the query to be run
  * @param  {Function} callback       callback that will be called with any errors and with the list of retrieved episodes
  */
-EpisodeSchema.static('getEpisodes', function(callingOptions: any, callback) {
-
-    if ('function' === typeof callingOptions) {
-        callback = callingOptions;
-        callingOptions = null;
-    }
+EpisodeSchema.static('getEpisodes', function(callingOptions ?: getEpisodesOptions) {
 
     var defaultOptions = {
         limit: 50
     };
 
-    var options: any = _.extend(defaultOptions, callingOptions);
+    var options = <getEpisodesOptions> _.extend(defaultOptions, callingOptions);
 
     var aggregate = this.find();
 
@@ -93,7 +116,7 @@ EpisodeSchema.static('getEpisodesNow', function(callingOptions, callback) {
     this.getEpisodes(callingOptions).exec(callback);
 });
 
-export var Episode = mongoose.model('Episode', EpisodeSchema);
+export var Episode = mongoose.model<IEpisodeModel>('Episode', EpisodeSchema);
 
 export var schema = EpisodeSchema;
 export var model = Episode;

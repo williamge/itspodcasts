@@ -88,7 +88,7 @@ export var channel = function(req, res) {
             }
         })
         .exec(
-            function(err, channel: any) {
+            function(err, channel) {
                 if (!channel) {
                     return res.send(404, "Sorry, we couldn't find that channel");
                 }
@@ -145,7 +145,7 @@ export var channelEpisodes = function(req, res) {
             }
         })
         .exec(
-            function(err, channel: any) {
+            function(err, channel) {
                 res.render('channelEpisodes', {
                     title: channel.title,
                     channel: channel

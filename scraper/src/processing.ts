@@ -18,7 +18,7 @@ import Channel = require('../../models/Channel');
 import Episode = require('../../models/Episode');
 import Scraper = require('./Scraper');
 
-export = function(options) {
+export = function Processing(options) {
     options = options || {};
 
     /**

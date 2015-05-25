@@ -10,6 +10,18 @@ import _ = require('lodash');
 import async = require('async');
 import assert = require('assert');
 
+//That's quite the name
+interface IPImageSchema {
+    originalURL: String;
+
+    imageBuffer: Buffer;
+
+    saveImage: (image: Buffer, callback: (err, result) => void) => void;
+    getImage: (image_id, callback: (err, result) => void) => void;
+}
+
+export interface IPImageModel extends IPImageSchema, mongoose.Document {}
+
 var PImageSchema = new mongoose.Schema( {
     originalURL: { type: String }
 });
@@ -40,7 +52,7 @@ PImageSchema.static('getImage',  function(image_id, callback) {
     return grid.get(new mongoose.Types.ObjectId(image_id), callback);
 });
 
-var PImage = mongoose.model('PImage', PImageSchema);
+var PImage = mongoose.model<IPImageModel>('PImage', PImageSchema);
 
 export var schema = PImageSchema;
 export var model = PImage;

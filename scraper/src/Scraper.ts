@@ -28,7 +28,9 @@ import PImage = require('../../models/PImage');
 import Channel = require('../../models/Channel');
 import Episode = require('../../models/Episode');
 
-var defaultOptions = {
+var defaultOptions: {
+    softUpdate: boolean;
+} = {
     /**
      * Determines whether the function should update the existing value of channel and episode
      * if they are set. 'true' will update existing object, 'false' will skip updating object (but
@@ -94,7 +96,7 @@ function durationToSeconds(duration) {
 }
 
 class Scraper {
-    options: any;
+    options;
     hasRun = false;
     channelImage;
     channel;
@@ -169,7 +171,7 @@ class Scraper {
     addScrapedEpisodes(episodes, storedEpisodeIDs) {
         var self = this;
 
-        _.each(episodes, function(episode: any) {
+        _.each(episodes, function(episode: Episode.IEpisodeModel) {
             if (storedEpisodeIDs.indexOf(episode.getCustomID()) === -1) {
                 winston.log('debug', 'adding episode to channel');
                 self.channel.addEpisode(
@@ -193,7 +195,7 @@ class Scraper {
 
         Channel.model.findOne({
             title: $channel('channel > title').text()
-        }, function elementResult(err, channel: any) {
+        }, function elementResult(err, channel) {
             if (!channel) {
                 var ChannelModel = Channel.model.bind(Channel);
                 channel = new ChannelModel();
@@ -248,7 +250,7 @@ class Scraper {
 
             //TODO: put this as a static method for PImage
             requestImage(self.channelImageURL,
-                function(err, imageResponse: any) {
+                function(err, imageResponse ?: Buffer) {
                     if (err) {
                         winston.error("Error scraping image at URL [" + self.channelImageURL + "], channel [" + self.channel.title + "]: " + err.toString());
                         return callback(err, self);
@@ -258,7 +260,7 @@ class Scraper {
                         originalURL: self.channelImageURL
                     });
 
-                    (<any> scrapedImage).imageBuffer = imageResponse;
+                    scrapedImage.imageBuffer = imageResponse;
 
                     self.channel.addImage(scrapedImage);
 
@@ -290,7 +292,8 @@ function requestImage(url, callback) {
             }
             switch (response.statusCode) {
                 case 200:
-                    var grid = new (<any> mongodb).Grid(mongoose.connection.db, 'channel_images');
+                    //TODO(wg): verify if this can be outright removed, it looks like the Channel model already does this with a PImage model
+                    //var grid = new (<any> mongodb).Grid(mongoose.connection.db, 'channel_images');
                     return callback(err, body);
                 default:
                     return callback(err);

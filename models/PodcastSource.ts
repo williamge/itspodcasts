@@ -5,6 +5,14 @@
 import mongoose = require('mongoose');
 
 
+interface IPodcastSourceSchema {
+    source: String;
+    type: String;
+    saveToDb: Boolean;
+}
+
+export interface IPodcastSourceModel extends IPodcastSourceSchema, mongoose.Document {}
+
 var PodcastSourceSchema = new mongoose.Schema( {
     source: {type: String, unique: true},
     type: String
@@ -18,7 +26,7 @@ PodcastSourceSchema.virtual('saveToDB').get(function () {
     return this._saveToDB || false;
 });
 
-var PodcastSource = mongoose.model('PodcastSource', PodcastSourceSchema);
+var PodcastSource = mongoose.model<IPodcastSourceModel>('PodcastSource', PodcastSourceSchema);
 
 /**
  * Retrieves a list of PodcastSources from the database and passes them to the callback.
