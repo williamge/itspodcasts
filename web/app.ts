@@ -17,26 +17,34 @@ import path = require('path');
 
 import mongoose = require('mongoose');
 
-var app = express();
 
-//For thwarting the mismatched versions of the typescript definitions for express, since this is on v3 and the definitions are for v4
-var anyExpress = <any> express;
+//Not worth it to get type definitions for these, so just import them and disregard the type since so little interacts with them.
+let favicon = require('serve-favicon');
+let logger = require('morgan');
+let methodOverride = require('method-override');
+let bodyParser = require('body-parser');
+let multer = require('multer');
+let errorHandler = require('errorhandler');
+
+var app = express();
 
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(anyExpress.favicon());
-app.use(anyExpress.logger('dev'));
-app.use(anyExpress.json());
-app.use(anyExpress.urlencoded());
-app.use(anyExpress.methodOverride());
-app.use(app.router);
+
+//TODO(wg): Add a favicon at some point and uncomment this.
+//app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride());
+app.use(multer());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
-    app.use(anyExpress.errorHandler());
+    app.use(errorHandler());
 }
 
 app.get('/templates/:template',
